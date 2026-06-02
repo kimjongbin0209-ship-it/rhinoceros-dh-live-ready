@@ -1973,8 +1973,8 @@
       <div class="lab-model-panel">
         <label class="lab-field-label">Select model</label>
         <div class="model-options" id="modelOptions">
-          <label class="model-option selected" data-value="claude">
-            <input type="radio" name="model" value="claude" checked>
+          <label class="model-option" data-value="claude">
+            <input type="radio" name="model" value="claude">
             <div class="model-icon claude">C</div>
             <div class="model-info">
               <div class="model-name">Claude / Anthropic</div>
@@ -1991,12 +1991,12 @@
             </div>
             <div class="model-check"></div>
           </label>
-          <label class="model-option" data-value="gemini">
-            <input type="radio" name="model" value="gemini">
+          <label class="model-option selected" data-value="gemini">
+            <input type="radio" name="model" value="gemini" checked>
             <div class="model-icon gemini">✦</div>
             <div class="model-info">
               <div class="model-name">Gemini / Google</div>
-              <div class="model-desc">gemini-3.5-flash</div>
+              <div class="model-desc">fast live demo</div>
             </div>
             <div class="model-check"></div>
           </label>
@@ -2005,7 +2005,7 @@
             <div class="model-icon compare">⇌</div>
             <div class="model-info">
               <div class="model-name">Compare All Three</div>
-              <div class="model-desc">GPT · Claude · Gemini</div>
+              <div class="model-desc">demo mode recommended</div>
             </div>
             <div class="model-check"></div>
           </label>
@@ -2524,29 +2524,44 @@ const DEMO_RESULTS = {
 // ── LIVE MODE: backend call structure (connect /api/analyze to activate) ──────
 // Supported model values: 'gpt', 'claude', 'gemini'
 async function callLiveAPI(text, model) {
-  const res = await fetch('/api/analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, model })
-  });
+  const controller = new AbortController();
+  const timeoutMs = 18000;
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  let data = null;
   try {
-    data = await res.json();
-  } catch (_) {
-    data = null;
-  }
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify({ text, model })
+    });
 
-  if (!res.ok) {
-    const msg = data?.detail || data?.error || `HTTP ${res.status}`;
-    throw new Error(msg);
-  }
+    let data = null;
+    try {
+      data = await res.json();
+    } catch (_) {
+      data = null;
+    }
 
-  if (!data || !data.scores || !data.dominant_frame) {
-    throw new Error('Backend returned an invalid analysis result.');
-  }
+    if (!res.ok) {
+      const msg = data?.detail || data?.error || `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
 
-  return data;
+    if (!data || !data.scores || !data.dominant_frame) {
+      throw new Error('Backend returned an invalid analysis result.');
+    }
+
+    return data;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`Live API timed out after ${timeoutMs / 1000}s; demo fallback used.`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ── DETECT LIVE ENDPOINT ─────────────────────────────────────────────────────
@@ -2599,7 +2614,7 @@ document.getElementById('labTextarea').addEventListener('input', updateCharCount
 updateCharCount();
 
 // ── MODEL SELECTOR ────────────────────────────────────────────────────────────
-let selectedModel = 'claude';
+let selectedModel = 'gemini';
 document.querySelectorAll('.model-option').forEach(opt => {
   opt.addEventListener('click', () => {
     document.querySelectorAll('.model-option').forEach(o=>o.classList.remove('selected'));
@@ -2813,9 +2828,14 @@ async function analyzeText(mode='demo') {
   activeBtn.classList.add('loading');
   activeBtn.textContent = mode === 'live' ? 'Calling API…' : 'Loading demo…';
   setLabStatus(mode === 'live'
-    ? 'Trying live analysis through /api/analyze. If the backend or API key is unavailable, this will fall back to demo results.'
+    ? 'Trying live analysis through /api/analyze. For fastest live testing, Gemini / Google is recommended.'
     : 'Using precomputed demo results. This mode is stable for presentations.',
     mode === 'live' ? 'ok' : 'warn');
+
+  if (mode === 'live' && selectedModel === 'compare') {
+    setLabStatus('For presentation speed, live Compare All Three is disabled. Showing precomputed comparison demo instead. Select Gemini for the live API test.', 'warn');
+    mode = 'demo';
+  }
 
   let gptResult = null, claudeResult = null, geminiResult = null;
   const fallbackNotes = [];

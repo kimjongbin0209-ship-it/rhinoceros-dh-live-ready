@@ -65,7 +65,7 @@ Interpretive frames:
 Return JSON with:
 - dominant_frame
 - secondary_frames
-- scores from 0 to 1 for all six frames
+- scores from 0 to 1 for all six frames. Important: if a frame is explicitly mentioned, give it a nonzero score; if dominant_frame is not Insufficient Evidence, the dominant frame score should normally be at least 0.75.
 - evidence_keywords
 - explanation
 - uncertainty: low / medium / high
@@ -90,12 +90,58 @@ function extractJson(text) {
   return JSON.parse(match[0]);
 }
 
+function frameToScoreKey(frame) {
+  return {
+    "Fascism / Totalitarianism": "fascism_totalitarianism",
+    "Conformity / Herd Mentality": "conformity_herd_mentality",
+    "Identity / Dehumanization": "identity_dehumanization",
+    "Absurdism / Satire": "absurdism_satire",
+    "Contemporary Political Resonance": "contemporary_political_resonance",
+    "Performance / Staging": "performance_staging"
+  }[frame] || null;
+}
+
+function inferScoreHints(result) {
+  const hints = {};
+  const dominantKey = frameToScoreKey(result?.dominant_frame);
+  if (dominantKey) hints[dominantKey] = Math.max(hints[dominantKey] || 0, 0.85);
+  if (Array.isArray(result?.secondary_frames)) {
+    for (const frame of result.secondary_frames.slice(0, 3)) {
+      const key = frameToScoreKey(frame);
+      if (key) hints[key] = Math.max(hints[key] || 0, 0.6);
+    }
+  }
+  const kwText = Array.isArray(result?.evidence_keywords) ? result.evidence_keywords.join(' ').toLowerCase() : '';
+  const keywordHints = [
+    ['fascism_totalitarianism', ['fascism','fascist','nazi','nazism','totalitarian','authoritarian','iron guard']],
+    ['conformity_herd_mentality', ['conformity','conformism','herd','groupthink','peer pressure','social pressure','collective']],
+    ['identity_dehumanization', ['identity','individuality','dehumanization','dehumanisation','humanity','loss of individuality','animalization','animalisation']],
+    ['absurdism_satire', ['absurd','satire','farce','comic','grotesque']],
+    ['contemporary_political_resonance', ['contemporary','modern','today','current','political resonance','populism','polarization']],
+    ['performance_staging', ['performance','staging','production','theatre','director','broadway']]
+  ];
+  for (const [key, words] of keywordHints) {
+    if (words.some(w => kwText.includes(w))) hints[key] = Math.max(hints[key] || 0, 0.45);
+  }
+  return hints;
+}
+
 function normalizeResult(result) {
   const scores = result?.scores || {};
   const normalizedScores = {};
   for (const key of SCORE_KEYS) {
     const n = Number(scores[key]);
     normalizedScores[key] = Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0;
+  }
+
+  // Some models occasionally return the correct frame labels but leave score fields at 0.
+  // Repair that case so the visualization remains meaningful.
+  const scoreSum = SCORE_KEYS.reduce((acc, key) => acc + normalizedScores[key], 0);
+  if (scoreSum < 0.05) {
+    const hints = inferScoreHints(result);
+    for (const key of SCORE_KEYS) {
+      normalizedScores[key] = hints[key] || 0.08;
+    }
   }
 
   const dominant = FRAMES.includes(result?.dominant_frame) ? result.dominant_frame : "Insufficient Evidence";
