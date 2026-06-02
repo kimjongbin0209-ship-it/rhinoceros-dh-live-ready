@@ -116,12 +116,21 @@ function normalizeResult(result) {
   };
 }
 
+function getOpenAIContent(data) {
+  if (data?.choices?.[0]?.message?.content) return data.choices[0].message.content;
+  if (data?.output_text) return data.output_text;
+  if (Array.isArray(data?.output)) {
+    return data.output.flatMap(item => item.content || []).map(part => part.text || part.content || "").join("\n");
+  }
+  return "";
+}
+
 async function analyzeWithOpenAI(text) {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured.");
+  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured in Vercel Environment Variables.");
 
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
@@ -129,13 +138,14 @@ async function analyzeWithOpenAI(text) {
     },
     body: JSON.stringify({
       model,
-      input: [
+      temperature: 0,
+      messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: buildUserPrompt(text) }
       ],
-      text: {
-        format: {
-          type: "json_schema",
+      response_format: {
+        type: "json_schema",
+        json_schema: {
           name: "rhinoceros_reception_analysis",
           strict: true,
           schema: analysisSchema
@@ -148,12 +158,12 @@ async function analyzeWithOpenAI(text) {
   if (!response.ok) {
     throw new Error(data?.error?.message || `OpenAI request failed with status ${response.status}`);
   }
-  return normalizeResult(extractJson(data.output_text));
+  return normalizeResult(extractJson(getOpenAIContent(data)));
 }
 
 async function analyzeWithAnthropic(text) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not configured.");
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not configured in Vercel Environment Variables.");
 
   const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -184,7 +194,7 @@ async function analyzeWithAnthropic(text) {
 
 async function analyzeWithGemini(text) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured.");
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured in Vercel Environment Variables.");
 
   const model = process.env.GEMINI_MODEL || "gemini-3.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;

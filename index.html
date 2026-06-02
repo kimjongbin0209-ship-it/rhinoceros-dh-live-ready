@@ -1978,7 +1978,7 @@
             <div class="model-icon claude">C</div>
             <div class="model-info">
               <div class="model-name">Claude / Anthropic</div>
-              <div class="model-desc">claude-sonnet-4-6</div>
+              <div class="model-desc">claude-sonnet-4-6-6</div>
             </div>
             <div class="model-check"></div>
           </label>
@@ -1987,7 +1987,7 @@
             <div class="model-icon gpt">G</div>
             <div class="model-info">
               <div class="model-name">GPT / OpenAI</div>
-              <div class="model-desc">gpt-4o</div>
+              <div class="model-desc">gpt-4o-mini</div>
             </div>
             <div class="model-check"></div>
           </label>
@@ -2522,26 +2522,31 @@ const DEMO_RESULTS = {
 };
 
 // ── LIVE MODE: backend call structure (connect /api/analyze to activate) ──────
-// Supported model values: 'gpt', 'claude', 'gemini'. Missing providers fall back to demo mode.
+// Supported model values: 'gpt', 'claude', 'gemini'
 async function callLiveAPI(text, model) {
   const res = await fetch('/api/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, model })
   });
-  let data = null;
-  try { data = await res.json(); } catch (_) { data = {}; }
-  if (!res.ok) {
-    throw new Error(data.error || data.detail || `API error (${res.status})`);
-  }
-  return data;
-}
 
-function setLabStatus(message, type='') {
-  const el = document.getElementById('labStatusMessage');
-  if(!el) return;
-  el.className = `lab-status-message ${type}`;
-  el.textContent = message || '';
+  let data = null;
+  try {
+    data = await res.json();
+  } catch (_) {
+    data = null;
+  }
+
+  if (!res.ok) {
+    const msg = data?.detail || data?.error || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+
+  if (!data || !data.scores || !data.dominant_frame) {
+    throw new Error('Backend returned an invalid analysis result.');
+  }
+
+  return data;
 }
 
 // ── DETECT LIVE ENDPOINT ─────────────────────────────────────────────────────
@@ -2614,7 +2619,7 @@ function destroyChart(key) {
 function renderResultCard(el, result, modelKey) {
   const modelLabel = modelKey==='gpt' ? 'GPT / OpenAI · gpt-4o'
                    : modelKey==='gemini' ? 'Gemini / Google · gemini-3.5-flash'
-                   : 'Claude / Anthropic · claude-sonnet-4';
+                   : 'Claude / Anthropic · claude-sonnet-4-6';
   el.innerHTML = `
     <div class="result-model-tag">
       <span>${modelLabel}</span>
