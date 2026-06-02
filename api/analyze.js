@@ -1,0 +1,255 @@
+const FRAMES = [
+  "Fascism / Totalitarianism",
+  "Conformity / Herd Mentality",
+  "Identity / Dehumanization",
+  "Absurdism / Satire",
+  "Contemporary Political Resonance",
+  "Performance / Staging",
+  "Insufficient Evidence"
+];
+
+const SCORE_KEYS = [
+  "fascism_totalitarianism",
+  "conformity_herd_mentality",
+  "identity_dehumanization",
+  "absurdism_satire",
+  "contemporary_political_resonance",
+  "performance_staging"
+];
+
+const analysisSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    dominant_frame: { type: "string", enum: FRAMES },
+    secondary_frames: {
+      type: "array",
+      items: { type: "string", enum: FRAMES.filter(f => f !== "Insufficient Evidence") },
+      maxItems: 3
+    },
+    scores: {
+      type: "object",
+      additionalProperties: false,
+      properties: Object.fromEntries(SCORE_KEYS.map(k => [k, { type: "number", minimum: 0, maximum: 1 }])),
+      required: SCORE_KEYS
+    },
+    evidence_keywords: {
+      type: "array",
+      items: { type: "string" },
+      minItems: 3,
+      maxItems: 8
+    },
+    explanation: { type: "string" },
+    uncertainty: { type: "string", enum: ["low", "medium", "high"] }
+  },
+  required: ["dominant_frame", "secondary_frames", "scores", "evidence_keywords", "explanation", "uncertainty"]
+};
+
+const systemPrompt = `You are an interpretive coding assistant for a Digital Humanities project on Eugène Ionesco's Rhinoceros.
+Classify reception texts into predefined interpretive frames.
+Do not invent evidence. Base your classification only on the supplied text.
+The LLM is not a final literary judge; it is a coding assistant for comparison.
+Return only valid JSON matching the requested schema.`;
+
+function buildUserPrompt(text) {
+  return `Analyze the following reception text about Eugène Ionesco's Rhinoceros.
+
+Interpretive frames:
+1. Fascism / Totalitarianism
+2. Conformity / Herd Mentality
+3. Identity / Dehumanization
+4. Absurdism / Satire
+5. Contemporary Political Resonance
+6. Performance / Staging
+
+Return JSON with:
+- dominant_frame
+- secondary_frames
+- scores from 0 to 1 for all six frames
+- evidence_keywords
+- explanation
+- uncertainty: low / medium / high
+
+Text:
+"""
+${text}
+"""`;
+}
+
+function send(res, status, body) {
+  res.statusCode = status;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.end(JSON.stringify(body));
+}
+
+function extractJson(text) {
+  if (!text || typeof text !== "string") throw new Error("Empty model response");
+  try { return JSON.parse(text); } catch (_) {}
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("No JSON object found in model response");
+  return JSON.parse(match[0]);
+}
+
+function normalizeResult(result) {
+  const scores = result?.scores || {};
+  const normalizedScores = {};
+  for (const key of SCORE_KEYS) {
+    const n = Number(scores[key]);
+    normalizedScores[key] = Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0;
+  }
+
+  const dominant = FRAMES.includes(result?.dominant_frame) ? result.dominant_frame : "Insufficient Evidence";
+  const secondary = Array.isArray(result?.secondary_frames)
+    ? result.secondary_frames.filter(f => FRAMES.includes(f) && f !== "Insufficient Evidence").slice(0, 3)
+    : [];
+
+  let keywords = Array.isArray(result?.evidence_keywords) ? result.evidence_keywords.map(String).filter(Boolean).slice(0, 8) : [];
+  while (keywords.length < 3) keywords.push("insufficient explicit evidence");
+
+  return {
+    dominant_frame: dominant,
+    secondary_frames: secondary,
+    scores: normalizedScores,
+    evidence_keywords: keywords,
+    explanation: String(result?.explanation || "The model did not provide a detailed explanation."),
+    uncertainty: ["low", "medium", "high"].includes(result?.uncertainty) ? result.uncertainty : "high"
+  };
+}
+
+async function analyzeWithOpenAI(text) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured.");
+
+  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      input: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: buildUserPrompt(text) }
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "rhinoceros_reception_analysis",
+          strict: true,
+          schema: analysisSchema
+        }
+      }
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data?.error?.message || `OpenAI request failed with status ${response.status}`);
+  }
+  return normalizeResult(extractJson(data.output_text));
+}
+
+async function analyzeWithAnthropic(text) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not configured.");
+
+  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 1600,
+      temperature: 0,
+      system: systemPrompt,
+      messages: [{ role: "user", content: `${buildUserPrompt(text)}\n\nReturn JSON only. No markdown.` }]
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data?.error?.message || `Anthropic request failed with status ${response.status}`);
+  }
+  const textOut = Array.isArray(data.content)
+    ? data.content.map(part => part.text || "").join("\n")
+    : "";
+  return normalizeResult(extractJson(textOut));
+}
+
+async function analyzeWithGemini(text) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured.");
+
+  const model = process.env.GEMINI_MODEL || "gemini-3.5-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{
+        role: "user",
+        parts: [{ text: `${systemPrompt}\n\n${buildUserPrompt(text)}\n\nReturn JSON only. No markdown.` }]
+      }],
+      generationConfig: {
+        temperature: 0,
+        responseMimeType: "application/json"
+      }
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data?.error?.message || `Gemini request failed with status ${response.status}`);
+  }
+  const textOut = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("\n") || "";
+  return normalizeResult(extractJson(textOut));
+}
+
+export default async function handler(req, res) {
+  if (req.method === "HEAD") {
+    res.statusCode = 204;
+    return res.end();
+  }
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Methods", "POST, HEAD, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.statusCode = 204;
+    return res.end();
+  }
+  if (req.method !== "POST") {
+    return send(res, 405, { error: "Only POST requests are allowed." });
+  }
+
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
+    const text = String(body.text || "").trim();
+    const model = String(body.model || "gpt").toLowerCase();
+
+    if (text.length < 50) {
+      return send(res, 400, { error: "Text is too short. Please provide at least 50 characters." });
+    }
+    if (text.length > 8000) {
+      return send(res, 400, { error: "Text is too long. Please use an excerpt under 8,000 characters." });
+    }
+
+    let result;
+    if (model === "gpt") result = await analyzeWithOpenAI(text);
+    else if (model === "claude") result = await analyzeWithAnthropic(text);
+    else if (model === "gemini") result = await analyzeWithGemini(text);
+    else return send(res, 400, { error: "Unsupported model. Use gpt, claude, or gemini." });
+
+    return send(res, 200, result);
+  } catch (error) {
+    console.error(error);
+    return send(res, 500, {
+      error: "Live analysis failed.",
+      detail: error.message
+    });
+  }
+}

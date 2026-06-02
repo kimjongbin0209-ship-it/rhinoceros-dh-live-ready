@@ -1,0 +1,2977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Fascism to Conformity — Rhinoceros Digital Humanities Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory: #F7F3EC;
+    --ivory-dark: #EDE8DF;
+    --charcoal: #2B2B2B;
+    --charcoal-light: #4A4A4A;
+    --red: #8B3A3A;
+    --red-light: #C0605A;
+    --red-pale: #F2E0DC;
+    --green: #4A6741;
+    --green-light: #6A8F62;
+    --green-pale: #DDE8DA;
+    --gray: #9A9A9A;
+    --gray-light: #E2DDD6;
+    --gray-mid: #C8C3BA;
+    --accent: #5C4A2A;
+    --toc-width: 220px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background-color: var(--ivory);
+    color: var(--charcoal);
+    font-family: 'EB Garamond', Georgia, serif;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--ivory-dark); }
+  ::-webkit-scrollbar-thumb { background: var(--gray-mid); border-radius: 3px; }
+
+  /* ── TOC SIDEBAR ── */
+  #toc {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--toc-width);
+    height: 100vh;
+    background: var(--charcoal);
+    color: var(--ivory);
+    padding: 2.5rem 1.5rem;
+    z-index: 100;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: transform 0.3s ease;
+  }
+
+  #toc .toc-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 2rem;
+    line-height: 1.4;
+  }
+
+  #toc nav { display: flex; flex-direction: column; gap: 0.15rem; }
+
+  #toc a {
+    font-family: 'EB Garamond', serif;
+    font-size: 0.82rem;
+    color: var(--gray-mid);
+    text-decoration: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 3px;
+    transition: background 0.2s, color 0.2s;
+    line-height: 1.3;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  #toc a:hover, #toc a.active {
+    background: rgba(255,255,255,0.08);
+    color: var(--ivory);
+  }
+
+  #toc a .toc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--red-light);
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    margin-left: var(--toc-width);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    background: var(--charcoal);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem 5rem 4rem 5rem;
+    overflow: hidden;
+  }
+
+  #hero::before {
+    content: 'RHINOCEROS';
+    position: absolute;
+    bottom: -2rem;
+    right: -1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(8rem, 18vw, 22rem);
+    font-weight: 700;
+    color: rgba(255,255,255,0.025);
+    line-height: 1;
+    pointer-events: none;
+    white-space: nowrap;
+    letter-spacing: -0.05em;
+  }
+
+  #hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red-light), var(--green-light));
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5.5vw, 5.5rem);
+    font-weight: 700;
+    color: var(--ivory);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gray-mid);
+  }
+
+  .hero-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    color: var(--gray);
+    margin-bottom: 3rem;
+    max-width: 560px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+    font-style: italic;
+  }
+
+  .hero-divider {
+    width: 60px;
+    height: 2px;
+    background: var(--red-light);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.7s forwards;
+  }
+
+  .hero-thesis {
+    max-width: 640px;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--ivory-dark);
+    border-left: 3px solid var(--green-light);
+    padding-left: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.9s forwards;
+  }
+
+  .hero-meta {
+    margin-top: 3rem;
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.1s forwards;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .hero-meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  .hero-meta-value {
+    font-size: 0.95rem;
+    color: var(--gray-mid);
+    font-style: italic;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION WRAPPER ── */
+  section {
+    padding: 5rem 5rem;
+    border-bottom: 1px solid var(--gray-light);
+  }
+
+  section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 600;
+    color: var(--charcoal);
+    line-height: 1.15;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .section-intro {
+    font-size: 1.15rem;
+    max-width: 700px;
+    color: var(--charcoal-light);
+    margin-bottom: 3rem;
+    line-height: 1.8;
+  }
+
+  /* ── RESEARCH QUESTION ── */
+  #research { background: var(--ivory); }
+
+  .rq-main {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--charcoal);
+    border-left: 4px solid var(--red);
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem;
+    background: var(--red-pale);
+    max-width: 760px;
+    line-height: 1.5;
+  }
+
+  .subquestions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+  }
+
+  .subq-card {
+    background: var(--charcoal);
+    color: var(--ivory);
+    padding: 1.5rem;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subq-card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: -0.5rem;
+    right: 0.8rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.05);
+    line-height: 1;
+  }
+
+  .subq-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--gray-mid);
+  }
+
+  /* ── METHOD ── */
+  #method { background: var(--ivory-dark); }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 1000px;
+  }
+
+  .method-step {
+    background: var(--ivory);
+    border: 1px solid var(--gray-light);
+    border-top: 3px solid var(--green);
+    padding: 1.4rem;
+    border-radius: 2px;
+    transition: box-shadow 0.2s;
+  }
+
+  .method-step:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+  .method-step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .method-step h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--charcoal);
+  }
+
+  .method-step p {
+    font-size: 0.88rem;
+    color: var(--charcoal-light);
+    line-height: 1.6;
+  }
+
+  /* ── TIMELINE ── */
+  #timeline { background: var(--charcoal); }
+
+  #timeline .section-label { color: var(--red-light); }
+  #timeline .section-title { color: var(--ivory); }
+  #timeline .section-intro { color: var(--gray); }
+
+  .timeline-track {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    cursor: grab;
+    user-select: none;
+    position: relative;
+  }
+
+  .timeline-track:active { cursor: grabbing; }
+
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--red-light), var(--green-light));
+  }
+
+  .timeline-card {
+    flex: 0 0 300px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 4.5rem 1.8rem 1.8rem;
+    margin: 2rem 0.75rem 1rem;
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .timeline-card:hover { background: rgba(255,255,255,0.09); }
+
+  .timeline-dot {
+    position: absolute;
+    top: -2.55rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px; height: 14px;
+    background: var(--ivory);
+    border-radius: 50%;
+    border: 3px solid var(--charcoal);
+  }
+
+  .timeline-card.active .timeline-dot {
+    background: var(--red-light);
+    box-shadow: 0 0 0 4px rgba(192,96,90,0.3);
+  }
+
+  .timeline-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--red-light);
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .timeline-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ivory);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  .timeline-card p {
+    font-size: 0.87rem;
+    color: var(--gray);
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+
+  .timeline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .timeline-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--gray-mid);
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .timeline-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--gray);
+    text-align: right;
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── CORPUS ── */
+  #corpus { background: var(--ivory); }
+
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--gray-mid);
+    background: transparent;
+    color: var(--charcoal-light);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: var(--red); color: var(--red); }
+  .filter-btn.active { background: var(--charcoal); color: var(--ivory); border-color: var(--charcoal); }
+
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .source-card {
+    background: var(--ivory);
+    border: 1px solid var(--gray-light);
+    border-left: 4px solid var(--gray-mid);
+    padding: 1.4rem;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .source-card.hidden {
+    display: none;
+  }
+
+  .source-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    border-left-color: var(--red);
+  }
+
+  .source-card.type-magazine { border-left-color: #7A6A9E; }
+  .source-card.type-academic { border-left-color: var(--green); }
+  .source-card.type-theatre { border-left-color: var(--red); }
+  .source-card.type-publisher { border-left-color: #C48A3A; }
+  .source-card.type-university { border-left-color: #4A7A8A; }
+  .source-card.type-political { border-left-color: #8B5E3C; }
+  .source-card.type-performance { border-left-color: #6A5A7A; }
+
+  .source-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--gray-mid);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .source-type-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 0.7rem;
+  }
+
+  .source-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--charcoal);
+    margin-bottom: 0.3rem;
+    line-height: 1.35;
+  }
+
+  .source-pub {
+    font-size: 0.82rem;
+    color: var(--charcoal-light);
+    margin-bottom: 0.9rem;
+  }
+
+  .source-frames {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .frame-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 0.18rem 0.45rem;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+    background: var(--ivory-dark);
+    border: 1px solid var(--gray-light);
+    color: var(--charcoal-light);
+  }
+
+  .source-note {
+    font-size: 0.83rem;
+    color: var(--gray);
+    line-height: 1.55;
+    border-top: 1px solid var(--gray-light);
+    padding-top: 0.8rem;
+    font-style: italic;
+  }
+
+  /* ── VISUALIZATIONS ── */
+  #visualizations { background: var(--ivory-dark); }
+
+  .viz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .viz-wide { grid-column: 1 / -1; }
+
+  .viz-panel {
+    background: var(--ivory);
+    border: 1px solid var(--gray-light);
+    border-radius: 4px;
+    padding: 2rem;
+  }
+
+  .viz-panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 0.3rem;
+  }
+
+  .viz-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red);
+    background: var(--red-pale);
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin-bottom: 1.2rem;
+    border-radius: 2px;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* ── SHIFT DIAGRAM ── */
+  .shift-diagram {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .shift-node {
+    flex: 1;
+    min-width: 140px;
+    padding: 1.2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .shift-node-inner {
+    background: var(--charcoal);
+    color: var(--ivory);
+    padding: 1.2rem 0.8rem;
+    border-radius: 4px;
+    transition: transform 0.2s;
+  }
+
+  .shift-node-inner:hover { transform: translateY(-3px); }
+
+  .shift-node-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--gray);
+    margin-bottom: 0.5rem;
+  }
+
+  .shift-node-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--ivory);
+    line-height: 1.3;
+  }
+
+  .shift-node-tags {
+    margin-top: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+
+  .shift-mini-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    padding: 0.1rem 0.3rem;
+    background: rgba(255,255,255,0.06);
+    color: var(--gray);
+    border-radius: 2px;
+  }
+
+  .shift-arrow {
+    font-size: 1.4rem;
+    color: var(--red-light);
+    flex: 0 0 auto;
+    padding: 0 0.2rem;
+  }
+
+  .shift-node:nth-child(1) .shift-node-inner { border-top: 3px solid var(--red-light); }
+  .shift-node:nth-child(3) .shift-node-inner { border-top: 3px solid #C48A3A; }
+  .shift-node:nth-child(5) .shift-node-inner { border-top: 3px solid var(--green-light); }
+  .shift-node:nth-child(7) .shift-node-inner { border-top: 3px solid #4A7A8A; }
+
+  /* ── EVIDENCE CARDS ── */
+  #evidence { background: var(--ivory); }
+
+  .evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
+  }
+
+  .evidence-card {
+    background: var(--charcoal);
+    color: var(--ivory);
+    padding: 2.5rem 2rem;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .evidence-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .evidence-card:nth-child(1)::after { background: var(--red-light); }
+  .evidence-card:nth-child(2)::after { background: #C48A3A; }
+  .evidence-card:nth-child(3)::after { background: var(--green-light); }
+
+  .evidence-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .evidence-card:nth-child(1) .evidence-period { color: var(--red-light); }
+  .evidence-card:nth-child(2) .evidence-period { color: #D4964A; }
+  .evidence-card:nth-child(3) .evidence-period { color: var(--green-light); }
+
+  .evidence-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    line-height: 1.3;
+  }
+
+  .evidence-card p {
+    font-size: 0.9rem;
+    color: var(--gray-mid);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+  }
+
+  .evidence-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .evidence-kw {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(255,255,255,0.07);
+    color: var(--gray-mid);
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── DATA CRITICISM ── */
+  #criticism { background: var(--red-pale); }
+
+  .criticism-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+    max-width: 1000px;
+  }
+
+  .criticism-item {
+    padding: 1.4rem;
+    border-left: 3px solid var(--red);
+    background: rgba(255,255,255,0.5);
+  }
+
+  .criticism-item h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--charcoal);
+  }
+
+  .criticism-item p {
+    font-size: 0.85rem;
+    color: var(--charcoal-light);
+    line-height: 1.6;
+  }
+
+  /* ── CONCLUSION ── */
+  #conclusion { background: var(--charcoal); }
+  #conclusion .section-label { color: var(--red-light); }
+  #conclusion .section-title { color: var(--ivory); }
+
+  .conclusion-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ivory);
+    line-height: 1.7;
+    max-width: 820px;
+    padding: 2.5rem 3rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    background: rgba(255,255,255,0.03);
+    border-radius: 2px;
+  }
+
+  .conclusion-quote::before {
+    content: '\201C';
+    position: absolute;
+    top: -1.2rem;
+    left: 2rem;
+    font-size: 5rem;
+    color: var(--red-light);
+    font-family: 'Playfair Display', serif;
+    line-height: 1;
+  }
+
+  .conclusion-coda {
+    margin-top: 3rem;
+    font-size: 1rem;
+    color: var(--gray);
+    max-width: 640px;
+    line-height: 1.8;
+  }
+
+  /* ── SOURCES ── */
+  #sources { background: var(--ivory-dark); }
+
+  .source-list {
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .source-list-item {
+    font-size: 0.87rem;
+    color: var(--charcoal-light);
+    line-height: 1.6;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--gray-light);
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .source-list-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--red);
+    flex-shrink: 0;
+    min-width: 2rem;
+  }
+
+  /* ── MOBILE ── */
+  #toc-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem; left: 1rem;
+    z-index: 200;
+    background: var(--charcoal);
+    color: var(--ivory);
+    border: none;
+    padding: 0.6rem 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 900px) {
+    #toc {
+      transform: translateX(-100%);
+    }
+    #toc.open {
+      transform: translateX(0);
+    }
+    #main { margin-left: 0; }
+    #toc-toggle { display: block; }
+    section { padding: 3rem 1.5rem; }
+    #hero { padding: 5rem 1.5rem 3rem; }
+    .viz-grid { grid-template-columns: 1fr; }
+    .viz-wide { grid-column: auto; }
+    .shift-diagram { flex-direction: column; align-items: stretch; }
+    .shift-arrow { transform: rotate(90deg); text-align: center; }
+    .hero-meta { flex-direction: column; gap: 1rem; }
+  }
+
+  /* ── INTERSECTION OBSERVER REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ══════════════════════════════════════════════
+     AI INTERPRETATION LAB
+  ══════════════════════════════════════════════ */
+  #ai-lab {
+    background: #1A1E1B;
+    border-bottom: 1px solid #2E3530;
+  }
+  #ai-lab .section-label { color: #6FAF7A; }
+  #ai-lab .section-title { color: #EDE8DF; }
+  #ai-lab .section-intro { color: #8A9E8C; }
+
+  /* Warning Box */
+  .lab-warning {
+    background: rgba(139,58,58,0.15);
+    border: 1px solid rgba(192,96,90,0.4);
+    border-left: 4px solid #C0605A;
+    padding: 1.2rem 1.5rem;
+    border-radius: 3px;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+  }
+  .lab-warning-head {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #C0605A;
+    margin-bottom: 0.5rem;
+  }
+  .lab-warning p {
+    font-size: 0.9rem;
+    color: #C8BCBA;
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  /* Mode badge */
+  .lab-mode-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .lab-mode-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .lab-mode-badge.demo {
+    color: #C48A3A;
+    border-color: rgba(196,138,58,0.4);
+    background: rgba(196,138,58,0.1);
+  }
+  .lab-mode-badge.live {
+    color: #6FAF7A;
+    border-color: rgba(111,175,122,0.4);
+    background: rgba(111,175,122,0.1);
+  }
+  .lab-mode-badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .lab-mode-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: #5A6A5C;
+    letter-spacing: 0.05em;
+  }
+
+  /* Controls panel */
+  .lab-controls {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    max-width: 1100px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .lab-controls { grid-template-columns: 1fr; }
+  }
+
+  .lab-input-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #2E3530;
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+
+  .lab-field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5A7A60;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .lab-select {
+    width: 100%;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    color: #C8C3BA;
+    background: #0F120F;
+    border: 1px solid #2E3530;
+    border-radius: 3px;
+    padding: 0.55rem 0.8rem;
+    margin-bottom: 1rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .lab-select:focus { border-color: #4A7A50; }
+  .lab-select option { background: #0F120F; }
+
+  .lab-textarea {
+    width: 100%;
+    min-height: 160px;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: #C8C3BA;
+    background: #0F120F;
+    border: 1px solid #2E3530;
+    border-radius: 3px;
+    padding: 0.8rem 1rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lab-textarea:focus { border-color: #4A7A50; }
+  .lab-textarea::placeholder { color: #3A4A3C; font-style: italic; }
+
+  .lab-char-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #3A4A3C;
+    text-align: right;
+    margin-top: 0.3rem;
+  }
+
+  /* Model selector */
+  .lab-model-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #2E3530;
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+
+  .model-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .model-option {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid #2E3530;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+  }
+  .model-option:hover { border-color: #4A7A50; background: rgba(74,122,80,0.06); }
+  .model-option.selected { border-color: #6FAF7A; background: rgba(111,175,122,0.1); }
+  .model-option input[type=radio] { display: none; }
+
+  .model-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 400;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+  .model-icon.gpt { background: rgba(16,163,127,0.2); color: #10A37F; border: 1px solid rgba(16,163,127,0.3); }
+  .model-icon.claude { background: rgba(212,167,107,0.2); color: #D4A76A; border: 1px solid rgba(212,167,107,0.3); }
+  .model-icon.gemini { background: rgba(100,130,210,0.2); color: #7A9EE0; border: 1px solid rgba(100,130,210,0.3); }
+  .model-icon.compare { background: rgba(111,175,122,0.2); color: #6FAF7A; border: 1px solid rgba(111,175,122,0.3); }
+
+  .model-info { flex: 1; }
+  .model-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    color: #C8C3BA;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .model-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: #5A6A5C;
+    margin-top: 0.15rem;
+    letter-spacing: 0.04em;
+  }
+  .model-check {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid #2E3530;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .model-option.selected .model-check {
+    background: #6FAF7A;
+    border-color: #6FAF7A;
+  }
+  .model-option.selected .model-check::after {
+    content: '';
+    width: 5px; height: 5px;
+    background: #1A1E1B;
+    border-radius: 50%;
+  }
+
+  /* Analyze button */
+  .lab-analyze-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    max-width: 1100px;
+  }
+
+  .lab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.75rem 2rem;
+    background: #4A7A50;
+    color: #EDE8DF;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .lab-btn.secondary {
+    background: transparent;
+    border: 1px solid #4A7A50;
+    color: #8A9E8C;
+  }
+  .lab-btn.secondary:hover {
+    background: rgba(111,175,122,0.08);
+    color: #EDE8DF;
+    box-shadow: 0 4px 20px rgba(74,122,80,0.18);
+  }
+  .lab-btn:hover { background: #5A9060; box-shadow: 0 4px 20px rgba(74,122,80,0.3); }
+  .lab-btn:disabled { background: #2E3530; color: #3A4A3C; cursor: not-allowed; border-color: #2E3530; }
+  .lab-btn.loading::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -100%;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, #6FAF7A, transparent);
+    animation: loading-bar 1.2s ease-in-out infinite;
+  }
+  @keyframes loading-bar {
+    to { left: 100%; }
+  }
+
+  .lab-btn-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #3A4A3C;
+    letter-spacing: 0.06em;
+  }
+  .lab-status-message {
+    width: 100%;
+    max-width: 1100px;
+    min-height: 1.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    color: #5A6A5C;
+    margin-top: -1.8rem;
+    margin-bottom: 2.2rem;
+  }
+  .lab-status-message.ok { color: #6FAF7A; }
+  .lab-status-message.warn { color: #C48A3A; }
+  .lab-status-message.error { color: #C0605A; }
+
+  /* Results area */
+  #lab-results {
+    display: none;
+    max-width: 1100px;
+  }
+  #lab-results.visible { display: block; }
+
+  .results-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6FAF7A;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #2E3530;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .results-header::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #6FAF7A;
+    box-shadow: 0 0 8px rgba(111,175,122,0.6);
+    flex-shrink: 0;
+  }
+
+  /* Single result layout */
+  .result-single-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 900px) { .result-single-grid { grid-template-columns: 1fr; } }
+
+  .result-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #2E3530;
+    border-radius: 4px;
+    padding: 1.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .result-card.model-gpt::before { background: #10A37F; }
+  .result-card.model-claude::before { background: #D4A76A; }
+  .result-card.model-gemini::before { background: #7A9EE0; }
+
+  .result-model-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .result-card.model-gpt .result-model-tag { color: #10A37F; }
+  .result-card.model-claude .result-model-tag { color: #D4A76A; }
+  .result-card.model-gemini .result-model-tag { color: #7A9EE0; }
+
+  .result-dominant {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 600;
+    color: #EDE8DF;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+
+  .result-uncertainty {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .result-uncertainty.low { background: rgba(111,175,122,0.15); color: #6FAF7A; border: 1px solid rgba(111,175,122,0.3); }
+  .result-uncertainty.medium { background: rgba(196,138,58,0.15); color: #C48A3A; border: 1px solid rgba(196,138,58,0.3); }
+  .result-uncertainty.high { background: rgba(192,96,90,0.15); color: #C0605A; border: 1px solid rgba(192,96,90,0.3); }
+
+  .result-secondary {
+    margin-bottom: 1rem;
+  }
+  .result-secondary-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5A6A5C;
+    margin-bottom: 0.4rem;
+  }
+  .result-secondary-frames {
+    display: flex; flex-wrap: wrap; gap: 0.3rem;
+  }
+  .result-frame-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    padding: 0.15rem 0.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #2E3530;
+    color: #8A9E8C;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .result-keywords {
+    margin-bottom: 1rem;
+  }
+  .result-kw-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5A6A5C;
+    margin-bottom: 0.4rem;
+  }
+  .result-kw-list {
+    display: flex; flex-wrap: wrap; gap: 0.3rem;
+  }
+  .result-kw {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.55rem;
+    background: rgba(111,175,122,0.08);
+    border: 1px solid rgba(111,175,122,0.2);
+    color: #6FAF7A;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .result-explanation {
+    font-size: 0.88rem;
+    color: #8A9E8C;
+    line-height: 1.65;
+    padding-top: 0.8rem;
+    border-top: 1px solid #2E3530;
+    font-style: italic;
+  }
+
+  /* Score bar chart */
+  .score-bars {
+    margin-top: 1rem;
+  }
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.55rem;
+  }
+  .score-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: #8A9E8C;
+    flex: 0 0 170px;
+    text-align: right;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .score-bar-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #4A6741, #6FAF7A);
+    transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+    width: 0;
+  }
+  .score-bar-fill.dominant { background: linear-gradient(90deg, #C0605A, #D4896A); }
+  .score-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #5A6A5C;
+    flex: 0 0 30px;
+  }
+
+  /* Charts panel */
+  .result-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 900px) { .result-charts-row { grid-template-columns: 1fr; } }
+
+  .lab-chart-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #2E3530;
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+  .lab-chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5A7A60;
+    margin-bottom: 1rem;
+  }
+
+  /* Comparison mode */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 1100px) { .compare-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 900px) { .compare-grid { grid-template-columns: 1fr; } }
+
+  .compare-agreement-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #2E3530;
+    border-radius: 4px;
+    padding: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .compare-agreement-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5A7A60;
+    margin-bottom: 1rem;
+  }
+
+  .agreement-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.65rem;
+  }
+  .agreement-frame-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #8A9E8C;
+    flex: 0 0 170px;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .agreement-bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .agreement-bar-gpt {
+    height: 7px;
+    border-radius: 3px;
+    background: rgba(16,163,127,0.5);
+    transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+    width: 0;
+  }
+  .agreement-bar-claude {
+    height: 7px;
+    border-radius: 3px;
+    background: rgba(212,167,107,0.5);
+    transition: width 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s;
+    width: 0;
+  }
+  .agreement-bar-gemini {
+    height: 7px;
+    border-radius: 3px;
+    background: rgba(122,158,224,0.5);
+    transition: width 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s;
+    width: 0;
+  }
+  .agreement-diff {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    flex: 0 0 38px;
+    text-align: right;
+  }
+  .agreement-diff.agree { color: #6FAF7A; }
+  .agreement-diff.disagree { color: #C0605A; }
+
+  .agreement-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid #2E3530;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #5A6A5C;
+    letter-spacing: 0.04em;
+  }
+  .legend-dot {
+    width: 10px; height: 4px;
+    border-radius: 2px;
+  }
+  .legend-dot.gpt { background: rgba(16,163,127,0.6); }
+  .legend-dot.claude { background: rgba(212,167,107,0.6); }
+  .legend-dot.gemini { background: rgba(122,158,224,0.6); }
+
+  /* Verdict badge */
+  .compare-verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    margin-top: 1rem;
+  }
+  .compare-verdict.agree { background: rgba(111,175,122,0.1); color: #6FAF7A; border: 1px solid rgba(111,175,122,0.3); }
+  .compare-verdict.disagree { background: rgba(196,138,58,0.1); color: #C48A3A; border: 1px solid rgba(196,138,58,0.3); }
+
+  /* Reset button */
+  .lab-reset-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.9rem;
+    background: transparent;
+    color: #5A6A5C;
+    border: 1px solid #2E3530;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+  }
+  .lab-reset-btn:hover { color: #8A9E8C; border-color: #4A5A4C; }
+</style>
+</head>
+<body>
+
+<button id="toc-toggle" onclick="document.getElementById('toc').classList.toggle('open')">☰ Nav</button>
+
+<aside id="toc">
+  <div class="toc-brand">Digital Humanities<br>Research Project</div>
+  <nav>
+    <a href="#hero"><span class="toc-num">—</span> Overview</a>
+    <a href="#research"><span class="toc-num">01</span> Research Question</a>
+    <a href="#method"><span class="toc-num">02</span> Method</a>
+    <a href="#timeline"><span class="toc-num">03</span> Timeline</a>
+    <a href="#corpus"><span class="toc-num">04</span> Corpus</a>
+    <a href="#visualizations"><span class="toc-num">05</span> Visualizations</a>
+    <a href="#evidence"><span class="toc-num">06</span> Evidence</a>
+    <a href="#criticism"><span class="toc-num">07</span> Data Criticism</a>
+    <a href="#ai-lab"><span class="toc-num">08</span> AI Lab</a>
+    <a href="#conclusion"><span class="toc-num">09</span> Conclusion</a>
+    <a href="#sources"><span class="toc-num">10</span> Sources</a>
+  </nav>
+</aside>
+
+<div id="main">
+
+  <!-- 0. HERO -->
+  <section id="hero">
+    <div class="hero-eyebrow">Digital Humanities · Reception History · Eugène Ionesco</div>
+    <h1 class="hero-title">From Fascism<br>to <em>Conformity</em></h1>
+    <p class="hero-subtitle">A Digital Humanities Analysis of the Reception of Eugène Ionesco's <em>Rhinoceros</em></p>
+    <div class="hero-divider"></div>
+    <p class="hero-thesis">This project traces how <em>Rhinoceros</em> has been read not only as an anti-fascist allegory, but increasingly as a broader critique of conformity, herd mentality, identity loss, and dehumanization.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Corpus Span</span>
+        <span class="hero-meta-value">1959 – 2026</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Sources (Preliminary)</span>
+        <span class="hero-meta-value">12 coded sources</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Method</span>
+        <span class="hero-meta-value">Manual coding + keyword frequency</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Status</span>
+        <span class="hero-meta-value">Work in progress</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. RESEARCH QUESTION -->
+  <section id="research">
+    <div class="section-label">01 — Research Question</div>
+    <h2 class="section-title">How did <em>Rhinoceros</em> move from an anti-fascist allegory to a broader critique of conformity?</h2>
+    <blockquote class="rq-main reveal">
+      "How has the reception of Eugène Ionesco's <em>Rhinoceros</em> changed over time? Was the play initially framed primarily as an anti-fascist or anti-totalitarian allegory, and has its reception gradually expanded toward broader concerns such as conformity, herd mentality, mass psychology, identity, and dehumanization?"
+    </blockquote>
+    <div class="subquestions reveal">
+      <div class="subq-card" data-num="1">
+        <p>Which interpretive keywords appear in different periods, and how do their frequencies shift across the timeline of reception?</p>
+      </div>
+      <div class="subq-card" data-num="2">
+        <p>How do political readings relating to fascism and totalitarianism relate to broader social or psychological readings?</p>
+      </div>
+      <div class="subq-card" data-num="3">
+        <p>What does this reception history reveal about the changing meanings of literary texts in relation to their historical contexts?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. METHOD -->
+  <section id="method">
+    <div class="section-label">02 — Methodology</div>
+    <h2 class="section-title">From Corpus Building to Close Reading</h2>
+    <p class="section-intro reveal">The project combines digital text analysis with traditional hermeneutics.</p>
+    <div class="method-grid reveal">
+      <div class="method-step">
+        <div class="method-step-num">Step 01</div>
+        <h4>Corpus Building</h4>
+        <p>Theatre reviews, academic articles, publisher descriptions, and university performance programmes were gathered from databases, newspaper archives, and digital repositories.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-step-num">Step 02</div>
+        <h4>Metadata Collection</h4>
+        <p>Each source was tagged with year, period, source type, publication/organization, and language. This structured metadata enables period-based and type-based filtering.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-step-num">Step 03</div>
+        <h4>Text Cleaning</h4>
+        <p>Texts were normalized: punctuation standardized, stopwords removed, and variant spellings of key terms (e.g. "rhinoceritis", "rhinocerisation") unified for consistent counting.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-step-num">Step 04</div>
+        <h4>Keyword Grouping</h4>
+        <p>Interpretive terms were clustered into thematic frames: <em>fascism/totalitarianism</em>, <em>conformity/herd mentality</em>, <em>identity/dehumanization</em>, <em>absurdism/satire</em>, and <em>contemporary resonance</em>.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-step-num">Step 05</div>
+        <h4>Preliminary Manual Coding</h4>
+        <p>The current dataset of 12 sources was coded by hand, assigning dominant interpretive frames. <strong>All visualizations based on this stage are explicitly labeled as preliminary.</strong></p>
+      </div>
+      <div class="method-step">
+        <div class="method-step-num">Step 06</div>
+        <h4>Keyword Frequency Analysis</h4>
+        <p>Planned for the next stage: automated frequency counts across the full corpus will replace and supplement the manual coding shown here.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-step-num">Step 07</div>
+        <h4>Close Reading</h4>
+        <p>Quantitative findings are interpreted through close reading of selected sources, ensuring that statistical patterns are grounded in textual evidence and historical context.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. TIMELINE -->
+  <section id="timeline">
+    <div class="section-label">03 — Periodization</div>
+    <h2 class="section-title">Four Periods of Reception</h2>
+    <p class="section-intro">Drag or scroll horizontally to explore the timeline.</p>
+    <div class="timeline-track" id="timelineTrack">
+      <div class="timeline-card active">
+        <div class="timeline-dot"></div>
+        <div class="timeline-period">1959 – 1975</div>
+        <h3>Early Postwar &amp; Cold War Reception</h3>
+        <p>The play premieres in Paris (1959) and reaches Broadway (1961). Early reviews foreground farce, satire, absurdist form, and the specific anti-fascist allegory rooted in Ionesco's Romanian experience.</p>
+        <div class="timeline-tags">
+          <span class="timeline-tag">absurdism</span>
+          <span class="timeline-tag">satire / farce</span>
+          <span class="timeline-tag">anti-fascism</span>
+          <span class="timeline-tag">Zero Mostel</span>
+          <span class="timeline-tag">Broadway 1961</span>
+        </div>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-dot"></div>
+        <div class="timeline-period">1976 – 2000</div>
+        <h3>Canonization &amp; Academic Reception</h3>
+        <p>The play enters university curricula and scholarly literature. Academic criticism develops systematic readings of the political allegory, the absurdist tradition, and Ionesco's autobiographical dimensions.</p>
+        <div class="timeline-tags">
+          <span class="timeline-tag">canonization</span>
+          <span class="timeline-tag">academic criticism</span>
+          <span class="timeline-tag">Theatre of the Absurd</span>
+          <span class="timeline-tag">Romanian context</span>
+        </div>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-dot"></div>
+        <div class="timeline-period">2001 – 2016</div>
+        <h3>Educational &amp; Global Performance Reception</h3>
+        <p>The play spreads globally through educational theatre and university productions. Publisher and licensing descriptions begin to emphasize broader themes alongside the fascist allegory.</p>
+        <div class="timeline-tags">
+          <span class="timeline-tag">educational theatre</span>
+          <span class="timeline-tag">global performance</span>
+          <span class="timeline-tag">social conformity</span>
+          <span class="timeline-tag">publisher framing</span>
+        </div>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-dot"></div>
+        <div class="timeline-period">2017 – 2026</div>
+        <h3>Contemporary Authoritarianism &amp; Conformity</h3>
+        <p>Against a backdrop of rising populism and authoritarianism, reviewers and production notes explicitly expand the allegory: conformity, herd mentality, identity loss, and epidemic/contagion as social metaphors gain prominence.</p>
+        <div class="timeline-tags">
+          <span class="timeline-tag">authoritarianism</span>
+          <span class="timeline-tag">conformity</span>
+          <span class="timeline-tag">herd mentality</span>
+          <span class="timeline-tag">dehumanization</span>
+          <span class="timeline-tag">contemporary resonance</span>
+        </div>
+      </div>
+    </div>
+    <p class="timeline-hint">← Scroll to navigate →</p>
+  </section>
+
+  <!-- 4. CORPUS -->
+  <section id="corpus">
+    <div class="section-label">04 — Preliminary Corpus</div>
+    <h2 class="section-title">Coded Sources</h2>
+    <p class="section-intro reveal">12 sources manually coded for dominant interpretive frames. <strong>Dataset is preliminary.</strong> Filter by source type to explore the distribution.</p>
+
+    <div class="filter-bar reveal">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="early">Early Reception</button>
+      <button class="filter-btn" data-filter="academic">Academic Criticism</button>
+      <button class="filter-btn" data-filter="publisher">Publisher / Metadata</button>
+      <button class="filter-btn" data-filter="university">University / Theatre</button>
+      <button class="filter-btn" data-filter="review">Contemporary Review</button>
+    </div>
+
+    <div class="source-grid" id="sourceGrid">
+      <!-- Cards injected by JS -->
+    </div>
+  </section>
+
+  <!-- 5. VISUALIZATIONS -->
+  <section id="visualizations">
+    <div class="section-label">05 — Visualizations</div>
+    <h2 class="section-title reveal">Preliminary Data Visualizations</h2>
+    <p class="section-intro reveal">All charts below reflect preliminary manual source coding only. They will be replaced with full keyword-frequency results as the corpus expands. <strong>Do not treat these as final findings.</strong></p>
+
+    <div class="viz-grid">
+      <div class="viz-panel viz-wide reveal">
+        <p class="viz-label">Preliminary — Manual Coding · Not Final Keyword Frequency</p>
+        <div class="viz-panel-title">A. Interpretive Frame Counts by Period</div>
+        <canvas id="chartFrames" height="100"></canvas>
+      </div>
+      <div class="viz-panel reveal">
+        <p class="viz-label">Preliminary — Source Type Distribution</p>
+        <div class="viz-panel-title">B. Source Types in Dataset</div>
+        <canvas id="chartTypes" height="220"></canvas>
+      </div>
+      <div class="viz-panel reveal">
+        <p class="viz-label">Preliminary — Interpretive Shift Diagram</p>
+        <div class="viz-panel-title">C. Interpretive Shift Over Time</div>
+        <div class="shift-diagram">
+          <div class="shift-node">
+            <div class="shift-node-inner">
+              <div class="shift-node-date">1959–1975</div>
+              <div class="shift-node-label">Anti-fascism &amp; Totalitarianism</div>
+              <div class="shift-node-tags">
+                <span class="shift-mini-tag">Iron Guard</span>
+                <span class="shift-mini-tag">Cold War</span>
+                <span class="shift-mini-tag">allegory</span>
+              </div>
+            </div>
+          </div>
+          <div class="shift-arrow">→</div>
+          <div class="shift-node">
+            <div class="shift-node-inner">
+              <div class="shift-node-date">1976–2000</div>
+              <div class="shift-node-label">Absurdism &amp; Satire</div>
+              <div class="shift-node-tags">
+                <span class="shift-mini-tag">Theatre of Absurd</span>
+                <span class="shift-mini-tag">academic canon</span>
+              </div>
+            </div>
+          </div>
+          <div class="shift-arrow">→</div>
+          <div class="shift-node">
+            <div class="shift-node-inner">
+              <div class="shift-node-date">2001–2016</div>
+              <div class="shift-node-label">Conformity &amp; Herd Mentality</div>
+              <div class="shift-node-tags">
+                <span class="shift-mini-tag">social critique</span>
+                <span class="shift-mini-tag">education</span>
+              </div>
+            </div>
+          </div>
+          <div class="shift-arrow">→</div>
+          <div class="shift-node">
+            <div class="shift-node-inner">
+              <div class="shift-node-date">2017–2026</div>
+              <div class="shift-node-label">Identity, Dehumanization &amp; Contemporary Resonance</div>
+              <div class="shift-node-tags">
+                <span class="shift-mini-tag">epidemic</span>
+                <span class="shift-mini-tag">populism</span>
+                <span class="shift-mini-tag">identity loss</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. EVIDENCE CARDS -->
+  <section id="evidence">
+    <div class="section-label">06 — Close Reading Evidence</div>
+    <h2 class="section-title reveal">Three Interpretive Frames in the Corpus</h2>
+    <p class="section-intro reveal">Selected examples from the corpus illustrate how different source types and historical periods activate different interpretive frameworks.</p>
+    <div class="evidence-grid">
+      <div class="evidence-card reveal">
+        <div class="evidence-period">Early Reception · 1961</div>
+        <h3>Farce, Satire, and the Broadway Stage</h3>
+        <p><em>Time</em> magazine's 1961 review of the Broadway production — starring Zero Mostel and directed by Joseph Anthony — foregrounds farce, satire, rationalizations, and what the play calls "rhinoceros fever." The explicit anti-fascist allegory is present but embedded in a discussion of comic performance and theatrical spectacle.</p>
+        <p>The <em>Playbill</em> record of the same production contextualizes Zero Mostel's Tony-winning performance, illustrating how early American reception shaped the play's popular meaning through theatrical celebrity and spectacle rather than political exegesis.</p>
+        <div class="evidence-keywords">
+          <span class="evidence-kw">farce</span>
+          <span class="evidence-kw">satire</span>
+          <span class="evidence-kw">rationalization</span>
+          <span class="evidence-kw">rhinoceros fever</span>
+          <span class="evidence-kw">Broadway</span>
+          <span class="evidence-kw">Zero Mostel</span>
+        </div>
+      </div>
+      <div class="evidence-card reveal">
+        <div class="evidence-period">Academic-Political Frame · 2017–2021</div>
+        <h3>Fascism, the Iron Guard, and Loss of Individuality</h3>
+        <p>Academic sources such as the 2021 article in <em>Turkish Academic Research Review</em> ground the play firmly in its Romanian biographical context: Ionesco's experience of watching intellectuals join the fascist Iron Guard in the 1930s. This frame treats the "rhinocerisation process" as a systematic analysis of totalitarian ideology and individual capitulation.</p>
+        <p>The 2017 <em>People's World</em> review similarly invokes fascism, xenophobia, and political warning — though its specific political orientation requires critical source evaluation.</p>
+        <div class="evidence-keywords">
+          <span class="evidence-kw">fascism</span>
+          <span class="evidence-kw">Iron Guard</span>
+          <span class="evidence-kw">totalitarianism</span>
+          <span class="evidence-kw">rhinocerisation</span>
+          <span class="evidence-kw">loss of individuality</span>
+          <span class="evidence-kw">Romania</span>
+        </div>
+      </div>
+      <div class="evidence-card reveal">
+        <div class="evidence-period">Contemporary Frame · 2024–2025</div>
+        <h3>Conformity, Contagion, and Modern Resonance</h3>
+        <p>The 2025 <em>Observer</em> review explicitly contrasts older Nazi/East European authoritarian readings with what it calls "a broader attack on unreflecting conformism." The 2024 <em>Le Monde</em> review of a French production describes a staging that strips away explicit historical references to emphasize epidemic, contamination, and community threat as social metaphors.</p>
+        <p>Together, these contemporary sources demonstrate a recognizable drift in critical framing: the political specificity of the original allegory is supplemented — and sometimes displaced — by a more generalized psychology of collective irrationality.</p>
+        <div class="evidence-keywords">
+          <span class="evidence-kw">conformity</span>
+          <span class="evidence-kw">herd mentality</span>
+          <span class="evidence-kw">epidemic / contagion</span>
+          <span class="evidence-kw">dehumanization</span>
+          <span class="evidence-kw">authoritarianism</span>
+          <span class="evidence-kw">contemporary resonance</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. DATA CRITICISM -->
+  <section id="criticism">
+    <div class="section-label">07 — Data Criticism</div>
+    <h2 class="section-title reveal">Methodological Limitations &amp; Honest Reflection</h2>
+    <p class="section-intro reveal">A responsible digital humanities project must be transparent about what its data cannot tell us.</p>
+    <div class="criticism-grid">
+      <div class="criticism-item reveal">
+        <h4>Archive Access Bias</h4>
+        <p>Older reviews from 1959–1975 are significantly harder to access digitally. The corpus is therefore skewed toward recent sources, which may exaggerate the apparent novelty of contemporary frames.</p>
+      </div>
+      <div class="criticism-item reveal">
+        <h4>Uneven Source Types</h4>
+        <p>The dataset mixes theatre reviews, academic articles, publisher descriptions, and university notices. These genres use interpretive language differently and for different audiences, making direct keyword comparison problematic.</p>
+      </div>
+      <div class="criticism-item reveal">
+        <h4>Publisher vs. Academic Language</h4>
+        <p>Licensing and publisher descriptions (e.g. Concord Theatricals) are written for marketing, not analysis. Their keyword choices reflect commercial framing rather than scholarly interpretation.</p>
+      </div>
+      <div class="criticism-item reveal">
+        <h4>English-Language Bias</h4>
+        <p>The corpus is predominantly English-language. French, German, and other-language reception may weight political and aesthetic frames differently. The 2024 <em>Le Monde</em> source is a notable but insufficient counterweight.</p>
+      </div>
+      <div class="criticism-item reveal">
+        <h4>Keyword vs. Close Reading</h4>
+        <p>Keyword frequency alone cannot distinguish between a critic who mentions fascism to reject that reading and one who endorses it. Close reading is an essential complement to any quantitative analysis.</p>
+      </div>
+      <div class="criticism-item reveal">
+        <h4>Sentiment Analysis Limits</h4>
+        <p>Sentiment analysis is secondary for this project because theatre reviews primarily judge productions rather than articulating interpretive positions. A positive review may still contain negative framing of the play's themes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI INTERPRETATION LAB -->
+  <section id="ai-lab">
+    <div class="section-label">08 — AI Interpretation Lab</div>
+    <h2 class="section-title">Testing Reception Frames with an LLM</h2>
+    <p class="section-intro">Select a source from the corpus, paste a reception text, choose a model, and classify its dominant interpretive frame. The LLM acts as a reproducible coding assistant — not a final arbiter of meaning.</p>
+
+    <div class="lab-warning">
+      <div class="lab-warning-head">⚠ Methodological Note</div>
+      <p>"The LLM is not treated as an objective literary judge. It is used as a coding assistant whose outputs must be compared with keyword analysis, source criticism, and human interpretation. AI frame classification is one input among many — not a finding in itself."</p>
+    </div>
+
+    <div class="lab-mode-bar">
+      <div class="lab-mode-badge demo" id="labModeBadge">
+        <span class="dot"></span>
+        <span id="labModeText">Demo Mode — Safe Fallback Ready</span>
+      </div>
+      <span class="lab-mode-note" id="labModeNote">Demo works offline. Live analysis uses /api/analyze when a backend is deployed.</span>
+    </div>
+
+    <div class="lab-controls">
+      <div class="lab-input-panel">
+        <label class="lab-field-label" for="sampleSelect">Load sample source from corpus</label>
+        <select class="lab-select" id="sampleSelect">
+          <option value="">— Select a sample source —</option>
+        </select>
+
+        <label class="lab-field-label" for="labTextarea">Reception text to analyze</label>
+        <textarea class="lab-textarea" id="labTextarea"
+          placeholder="Paste a theatre review, academic passage, or publisher description here…"></textarea>
+        <div class="lab-char-count"><span id="charCount">0</span> characters</div>
+      </div>
+
+      <div class="lab-model-panel">
+        <label class="lab-field-label">Select model</label>
+        <div class="model-options" id="modelOptions">
+          <label class="model-option selected" data-value="claude">
+            <input type="radio" name="model" value="claude" checked>
+            <div class="model-icon claude">C</div>
+            <div class="model-info">
+              <div class="model-name">Claude / Anthropic</div>
+              <div class="model-desc">claude-sonnet-4-6</div>
+            </div>
+            <div class="model-check"></div>
+          </label>
+          <label class="model-option" data-value="gpt">
+            <input type="radio" name="model" value="gpt">
+            <div class="model-icon gpt">G</div>
+            <div class="model-info">
+              <div class="model-name">GPT / OpenAI</div>
+              <div class="model-desc">gpt-4o</div>
+            </div>
+            <div class="model-check"></div>
+          </label>
+          <label class="model-option" data-value="gemini">
+            <input type="radio" name="model" value="gemini">
+            <div class="model-icon gemini">✦</div>
+            <div class="model-info">
+              <div class="model-name">Gemini / Google</div>
+              <div class="model-desc">gemini-3.5-flash</div>
+            </div>
+            <div class="model-check"></div>
+          </label>
+          <label class="model-option" data-value="compare">
+            <input type="radio" name="model" value="compare">
+            <div class="model-icon compare">⇌</div>
+            <div class="model-info">
+              <div class="model-name">Compare All Three</div>
+              <div class="model-desc">GPT · Claude · Gemini</div>
+            </div>
+            <div class="model-check"></div>
+          </label>
+        </div>
+
+        <label class="lab-field-label">Interpretive frames</label>
+        <div style="display:flex;flex-direction:column;gap:0.25rem;">
+          <div class="result-frame-badge" style="font-size:0.6rem;padding:0.2rem 0.5rem;">Fascism / Totalitarianism</div>
+          <div class="result-frame-badge" style="font-size:0.6rem;padding:0.2rem 0.5rem;">Conformity / Herd Mentality</div>
+          <div class="result-frame-badge" style="font-size:0.6rem;padding:0.2rem 0.5rem;">Identity / Dehumanization</div>
+          <div class="result-frame-badge" style="font-size:0.6rem;padding:0.2rem 0.5rem;">Absurdism / Satire</div>
+          <div class="result-frame-badge" style="font-size:0.6rem;padding:0.2rem 0.5rem;">Contemporary Political Resonance</div>
+          <div class="result-frame-badge" style="font-size:0.6rem;padding:0.2rem 0.5rem;">Performance / Staging</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lab-analyze-row">
+      <button class="lab-btn" id="demoAnalyzeBtn">Show Demo Analysis</button>
+      <button class="lab-btn secondary" id="liveAnalyzeBtn">Analyze with Live API</button>
+      <span class="lab-btn-note" id="analyzeNote">Requires text input (min. 50 characters)</span>
+    </div>
+    <div class="lab-status-message" id="labStatusMessage"></div>
+
+    <!-- RESULTS -->
+    <div id="lab-results">
+      <div class="results-header" id="resultsHeader">Analysis complete</div>
+
+      <!-- Single model results -->
+      <div id="singleResults">
+        <div class="result-single-grid">
+          <div class="result-card" id="mainResultCard">
+            <!-- injected by JS -->
+          </div>
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">Frame scores — bar view</div>
+            <div id="scoreBarViz"></div>
+          </div>
+        </div>
+        <div class="result-charts-row">
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">Frame distribution — polar area</div>
+            <canvas id="polarChart" height="240"></canvas>
+          </div>
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">Frame distribution — radar</div>
+            <canvas id="radarChart" height="240"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compare mode results -->
+      <div id="compareResults" style="display:none;">
+        <div class="compare-grid">
+          <div class="result-card model-gpt" id="compareGptCard"><!-- injected --></div>
+          <div class="result-card model-claude" id="compareClaudeCard"><!-- injected --></div>
+          <div class="result-card model-gemini" id="compareGeminiCard"><!-- injected --></div>
+        </div>
+        <div class="compare-agreement-panel">
+          <div class="compare-agreement-title">Model Agreement — Frame Score Comparison</div>
+          <div id="agreementViz"></div>
+          <div class="agreement-legend">
+            <div class="legend-item"><div class="legend-dot gpt"></div> GPT / OpenAI</div>
+            <div class="legend-item"><div class="legend-dot claude"></div> Claude / Anthropic</div>
+            <div class="legend-item"><div class="legend-dot gemini"></div> Gemini / Google</div>
+          </div>
+          <div id="verdictBadge"></div>
+        </div>
+        <div class="result-charts-row">
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">GPT — polar area</div>
+            <canvas id="polarChartGpt" height="240"></canvas>
+          </div>
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">Claude — polar area</div>
+            <canvas id="polarChartClaude" height="240"></canvas>
+          </div>
+        </div>
+        <div class="result-charts-row">
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">Gemini — polar area</div>
+            <canvas id="polarChartGemini" height="240"></canvas>
+          </div>
+          <div class="lab-chart-panel">
+            <div class="lab-chart-title">All three — radar overlay</div>
+            <canvas id="radarChartCompare" height="240"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <button class="lab-reset-btn" id="resetBtn">↺ Reset Analysis</button>
+    </div>
+  </section>
+
+  <!-- 9. CONCLUSION -->
+  <section id="conclusion">
+    <div class="section-label">09 — Conclusion</div>
+    <h2 class="section-title reveal">A Structurally Flexible Allegory</h2>
+    <blockquote class="conclusion-quote reveal">
+      Rhinoceros remains powerful because its allegory is both historically specific and structurally flexible. It can be read through the memory of fascism and totalitarianism, but it also continues to describe broader patterns of conformity, collective irrationality, identity loss, and dehumanization.
+    </blockquote>
+    <p class="conclusion-coda reveal">
+      This reception history suggests that the play's meaning is not simply discovered but actively constructed by each historical moment. The dominance of conformity and herd-mentality framing in recent criticism is not a correction of earlier fascist readings but an extension of them — a sign that the mechanisms Ionesco dramatized remain legible, and urgent, in very different political contexts.<br><br>
+      <em>Further stages of this project will expand the corpus, conduct systematic keyword-frequency analysis, and incorporate non-English-language sources to test whether this preliminary pattern holds across a broader and more balanced dataset.</em>
+    </p>
+  </section>
+
+  <!-- 9. SOURCES -->
+  <section id="sources">
+    <div class="section-label">10 — Sources &amp; Dataset</div>
+    <h2 class="section-title reveal">Preliminary Corpus — Coded Sources</h2>
+    <p class="section-intro reveal">12 sources manually coded. Dataset is <strong>preliminary</strong> and will be expanded.</p>
+    <div class="source-list" id="sourceList">
+      <!-- Injected by JS -->
+    </div>
+  </section>
+
+</div><!-- /main -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ── SOURCE DATA ──────────────────────────────────────────────────────────────
+const sources = [
+  { id:"S1", year:1961, period:"1959–1975", type:"magazine review", filterType:"early",
+    title:"Theater: New Play on Broadway", pub:"Time",
+    frames:["absurdism / form","satire / farce","rationalization"],
+    note:"Early Broadway reception emphasizing farce, satire, rationalizations, clichés, and rhinoceros fever rather than only explicit fascism." },
+  { id:"S2", year:1961, period:"1959–1975", type:"performance history", filterType:"early",
+    title:"Vintage Playbill: Rhinoceros, Starring Zero Mostel", pub:"Playbill",
+    frames:["performance history","Broadway reception"],
+    note:"Useful for contextualizing the 1961 Broadway production and Zero Mostel's Tony-winning role." },
+  { id:"S3", year:2021, period:"2017–2026", type:"academic article", filterType:"academic",
+    title:"Rhinocerisation Process in Rhinoceros by Eugène Ionesco", pub:"Turkish Academic Research Review",
+    frames:["fascism / totalitarianism","loss of individuality","Iron Guard"],
+    note:"Academic source linking the play to fascism, totalitarian ideology, Romanian context, and loss of individuality." },
+  { id:"S4", year:2025, period:"2017–2026", type:"theatre review", filterType:"review",
+    title:"Rhinoceros review — Ionesco's absurdist classic is taken around the horn", pub:"The Guardian",
+    frames:["conformity / herd mentality","right-wing authoritarianism","passivity"],
+    note:"Contemporary review framing the play around conformity, authoritarianism, passivity, and herd-like behavior." },
+  { id:"S5", year:2025, period:"2017–2026", type:"theatre review", filterType:"review",
+    title:"The week in theatre: Rhinoceros", pub:"The Observer / The Guardian",
+    frames:["unreflecting conformism","authoritarianism","contemporary resonance"],
+    note:"Explicitly contrasts Nazi/East European authoritarian readings with a broader attack on unreflecting conformism." },
+  { id:"S6", year:2024, period:"2017–2026", type:"theatre review", filterType:"review",
+    title:"Bérangère Vantusso fait éclater la modernité de Rhinocéros", pub:"Le Monde",
+    frames:["modernity","epidemic / contagion","totalitarianism","dehumanization"],
+    note:"French review describing a modern staging that strips away explicit historical references and emphasizes epidemic, contamination, and community threat." },
+  { id:"S7", year:2025, period:"2017–2026", type:"political / cultural essay", filterType:"review",
+    title:"If fascism came to power, how similar would our reaction be to those in Ionesco's Rhinoceros?", pub:"UCL Europe Blog",
+    frames:["fascism","psychological factors","conformism","political culture"],
+    note:"Connects fascism to emotions, fears, inertia, conformism, and subjective/psychological factors." },
+  { id:"S8", year:2017, period:"2017–2026", type:"university newspaper / preview", filterType:"university",
+    title:"Rhinoceros deals with themes of conformity and fascism", pub:"The Volante",
+    frames:["conformity / herd mentality","fascism","groupthink"],
+    note:"Connects conformity, fascism, groupthink, normalized violence, and seduction of simple solutions." },
+  { id:"S9", year:2020, period:"2017–2026", type:"university theatre description", filterType:"university",
+    title:"Rhinoceros", pub:"UNSW Sydney",
+    frames:["fascism","conformity","herd mentality","humanity"],
+    note:"Educational/performance description linking fascism, conformity, herd mentality, and the question of preserving humanity." },
+  { id:"S10", year:2026, period:"2017–2026", type:"publisher / licensing description", filterType:"publisher",
+    title:"Rhinoceros", pub:"Concord Theatricals",
+    frames:["political satire","human condition","identity","social order"],
+    note:"Publisher-style description useful for tracking how the play is marketed and summarized today." },
+  { id:"S11", year:2017, period:"2017–2026", type:"theatre review", filterType:"review",
+    title:"Ionesco's not so absurd Rhinoceros warns of the fascist takeover", pub:"People's World",
+    frames:["fascism","Iron Guard","xenophobia","political warning"],
+    note:"Strongly political contemporary reading; use with source criticism due to the publication's clear political orientation." },
+  { id:"S12", year:2020, period:"2017–2026", type:"university theatre description", filterType:"university",
+    title:"Rhinoceros", pub:"University of Waterloo",
+    frames:["fascism","social conformity","rhinoceritis","Berenger"],
+    note:"Describes the play as a response to resurfacing fascism, but more importantly as an attack on social conformity." }
+];
+
+// ── TYPE STYLE MAP ──────────────────────────────────────────────────────────
+function typeClass(t) {
+  if(t==="early") return "type-magazine";
+  if(t==="academic") return "type-academic";
+  if(t==="review") return "type-theatre";
+  if(t==="publisher") return "type-publisher";
+  if(t==="university") return "type-university";
+  return "";
+}
+
+// ── RENDER SOURCE CARDS ─────────────────────────────────────────────────────
+function renderCards(filter) {
+  const grid = document.getElementById('sourceGrid');
+  grid.innerHTML = '';
+  sources.forEach(s => {
+    const hidden = filter !== 'all' && s.filterType !== filter;
+    const div = document.createElement('div');
+    div.className = `source-card ${typeClass(s.filterType)}${hidden?' hidden':''}`;
+    div.innerHTML = `
+      <div class="source-year">${s.year}</div>
+      <div class="source-type-tag">${s.type}</div>
+      <div class="source-title">${s.title}</div>
+      <div class="source-pub">${s.pub}</div>
+      <div class="source-frames">${s.frames.map(f=>`<span class="frame-tag">${f}</span>`).join('')}</div>
+      <div class="source-note">${s.note}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+renderCards('all');
+
+// ── FILTER BUTTONS ──────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCards(btn.dataset.filter);
+  });
+});
+
+// ── SOURCE LIST ─────────────────────────────────────────────────────────────
+const sourceListEl = document.getElementById('sourceList');
+sources.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'source-list-item';
+  div.innerHTML = `<span class="source-list-id">${s.id}</span><span><em>${s.title}</em> — ${s.pub}, ${s.year}. [${s.type}]</span>`;
+  sourceListEl.appendChild(div);
+});
+
+// ── CHART A: FRAME COUNTS BY PERIOD ─────────────────────────────────────────
+const frameGroups = {
+  "Fascism / Totalitarianism": 0,
+  "Conformity / Herd Mentality": 0,
+  "Absurdism / Satire": 0,
+  "Identity / Dehumanization": 0,
+  "Contemporary Resonance": 0,
+  "Performance / Broadway": 0,
+};
+
+const framePeriodData = {
+  "1959–1975": { ...frameGroups },
+  "2017–2026": { ...frameGroups }
+};
+
+const fascismKws = ["fascism","fascism / totalitarianism","totalitarianism","iron guard","xenophobia","political warning","right-wing authoritarianism","authoritarianism","unreflecting conformism","conformism"];
+const conformKws = ["conformity","conformity / herd mentality","herd mentality","social conformity","groupthink","passivity","unreflecting conformism","conformism","rhinoceritis"];
+const absurdKws = ["absurdism / form","satire / farce","rationalization","political satire","absurdism","satire"];
+const identityKws = ["loss of individuality","dehumanization","identity","human condition","humanity","modernity","epidemic / contagion","psychological factors"];
+const contempKws = ["contemporary resonance","political culture","social order","berenger"];
+const perfKws = ["performance history","broadway reception"];
+
+sources.forEach(s => {
+  const p = s.period;
+  if(!framePeriodData[p]) return;
+  s.frames.forEach(f => {
+    const fl = f.toLowerCase();
+    if(fascismKws.some(k=>fl.includes(k))) framePeriodData[p]["Fascism / Totalitarianism"]++;
+    if(conformKws.some(k=>fl.includes(k))) framePeriodData[p]["Conformity / Herd Mentality"]++;
+    if(absurdKws.some(k=>fl.includes(k))) framePeriodData[p]["Absurdism / Satire"]++;
+    if(identityKws.some(k=>fl.includes(k))) framePeriodData[p]["Identity / Dehumanization"]++;
+    if(contempKws.some(k=>fl.includes(k))) framePeriodData[p]["Contemporary Resonance"]++;
+    if(perfKws.some(k=>fl.includes(k))) framePeriodData[p]["Performance / Broadway"]++;
+  });
+});
+
+const labels = Object.keys(frameGroups);
+const chartColors = ['#8B3A3A','#4A6741','#7A6A9E','#C48A3A','#4A7A8A','#6A5A7A'];
+
+const ctxA = document.getElementById('chartFrames').getContext('2d');
+new Chart(ctxA, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: '1959–1975', data: labels.map(l=>framePeriodData["1959–1975"][l]),
+        backgroundColor: '#8B3A3A', borderRadius: 3 },
+      { label: '2017–2026', data: labels.map(l=>framePeriodData["2017–2026"][l]),
+        backgroundColor: '#4A6741', borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#2B2B2B', font: { family: "'EB Garamond'" } } },
+      title: { display: false },
+      subtitle: { display: true, text: '⚠ Preliminary manual coding only — not final keyword-frequency results', color: '#8B3A3A', font: { size: 11, family: "'DM Mono', monospace" }, padding: { bottom: 12 } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#4A4A4A', font: { family: "'EB Garamond'", size: 11 } } },
+      y: { beginAtZero: true, ticks: { color: '#4A4A4A', stepSize: 1, font: { family: "'EB Garamond'" } }, grid: { color: '#E2DDD6' } }
+    }
+  }
+});
+
+// ── CHART B: SOURCE TYPE DISTRIBUTION ───────────────────────────────────────
+const typeCounts = {};
+sources.forEach(s => { typeCounts[s.filterType] = (typeCounts[s.filterType]||0) + 1; });
+const typeLabels = { early:'Early Reception', academic:'Academic', publisher:'Publisher', university:'University/Theatre', review:'Contemporary Review' };
+
+const ctxB = document.getElementById('chartTypes').getContext('2d');
+new Chart(ctxB, {
+  type: 'doughnut',
+  data: {
+    labels: Object.keys(typeCounts).map(k=>typeLabels[k]||k),
+    datasets: [{
+      data: Object.values(typeCounts),
+      backgroundColor: ['#8B3A3A','#4A6741','#C48A3A','#4A7A8A','#7A6A9E'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position:'bottom', labels:{ color:'#2B2B2B', font:{ family:"'EB Garamond'", size:12 }, padding:14, boxWidth:14 } },
+      subtitle: { display:true, text:'⚠ Preliminary — 12 sources only', color:'#8B3A3A', font:{ size:11, family:"'DM Mono', monospace" }, padding:{ bottom:12 } }
+    }
+  }
+});
+
+// ── TIMELINE DRAG ────────────────────────────────────────────────────────────
+const track = document.getElementById('timelineTrack');
+let isDown=false, startX, scrollLeft;
+track.addEventListener('mousedown', e=>{ isDown=true; track.classList.add('active'); startX=e.pageX-track.offsetLeft; scrollLeft=track.scrollLeft; });
+track.addEventListener('mouseleave',()=>{ isDown=false; });
+track.addEventListener('mouseup',()=>{ isDown=false; });
+track.addEventListener('mousemove', e=>{ if(!isDown)return; e.preventDefault(); const x=e.pageX-track.offsetLeft; const walk=(x-startX)*1.5; track.scrollLeft=scrollLeft-walk; });
+
+// ── INTERSECTION OBSERVER ────────────────────────────────────────────────────
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+reveals.forEach(r=>observer.observe(r));
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AI INTERPRETATION LAB
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── FRAME DEFINITIONS ────────────────────────────────────────────────────────
+const FRAMES = [
+  { key: 'fascism_totalitarianism',       label: 'Fascism / Totalitarianism',       short: 'Fascism' },
+  { key: 'conformity_herd_mentality',     label: 'Conformity / Herd Mentality',     short: 'Conformity' },
+  { key: 'identity_dehumanization',       label: 'Identity / Dehumanization',       short: 'Identity' },
+  { key: 'absurdism_satire',              label: 'Absurdism / Satire',              short: 'Absurdism' },
+  { key: 'contemporary_political_resonance', label: 'Contemporary Political Resonance', short: 'Contemp.' },
+  { key: 'performance_staging',           label: 'Performance / Staging',           short: 'Staging' },
+];
+
+const FRAME_COLORS = {
+  fascism_totalitarianism:         'rgba(192,96,90,0.75)',
+  conformity_herd_mentality:       'rgba(111,175,122,0.75)',
+  identity_dehumanization:         'rgba(74,122,138,0.75)',
+  absurdism_satire:                'rgba(196,138,58,0.75)',
+  contemporary_political_resonance:'rgba(122,106,158,0.75)',
+  performance_staging:             'rgba(160,140,110,0.75)',
+};
+
+// ── SAMPLE TEXTS (representative summaries in researcher's own words) ─────────
+const SAMPLE_TEXTS = {
+  S1: `The 1961 Broadway production of Rhinoceros, starring Zero Mostel and Eli Wallach, was received primarily as an exercise in theatrical farce and comic spectacle. Critics emphasized the absurdist form, the cascading rationalizations of characters succumbing to the epidemic, and the satirical treatment of social conformity through clichéd language. The rhinoceros fever functions as a comedic metaphor, and reviewers foregrounded the play's tone of dark comedy over its political allegory.`,
+  S3: `This academic analysis treats Rhinoceros as a direct response to Ionesco's experience of watching Romanian intellectuals join the fascist Iron Guard in the 1930s. The rhinocerisation process is interpreted as a systematic dramatisation of totalitarian ideology: the loss of individual will, the seduction of collective violence, and the mechanisms by which fascism normalises itself within a community. The play is rooted in a historically specific anti-fascist allegory.`,
+  S4: `A recent major production of Rhinoceros foregrounds the play's relevance to contemporary right-wing authoritarianism and the passivity of liberal society in the face of political transformation. Critics describe the play as a study in conformity: the gradual, almost unremarkable way in which individuals abandon critical thinking and join the herd. The emphasis falls less on the historical memory of fascism than on the psychology of collective behaviour in the present.`,
+  S5: `This review explicitly argues against reducing the play to a Nazi or East European authoritarian allegory, contending instead that Ionesco's deeper subject is unreflecting conformism as a general human tendency. The production is praised for stripping away historically specific references to reveal a broader portrait of how social pressure, peer imitation, and the desire for belonging overwhelm individual resistance. The contemporary resonance is felt as universal rather than tied to any specific political context.`,
+  S6: `A French production chosen to strip the play of explicit historical markers, reimagining the rhinocerisation as an epidemic or contagion: a spreading illness that colonises the community through proximity and social contact. The staging emphasises dehumanisation and the collapse of individual identity into collective transformation. The threat is rendered as biological and social simultaneously, gesturing toward contemporary anxieties about information contagion, viral ideology, and the fragility of the human.`,
+  S12: `This university theatre description presents Rhinoceros as a response to the resurgence of fascist tendencies but, more centrally, as a sustained attack on social conformity. The play dramatises how the pressure to conform — to become like everyone else, to accept the simplified worldview of the majority — is more insidious than overt political coercion. Berenger's resistance is framed as a defence of individuality against the rhinoceritis of peer pressure and group identity.`,
+};
+
+// ── PRECOMPUTED DEMO RESULTS ──────────────────────────────────────────────────
+const DEMO_RESULTS = {
+  claude: {
+    S1: {
+      dominant_frame: 'Absurdism / Satire',
+      secondary_frames: ['Fascism / Totalitarianism', 'Performance / Staging'],
+      scores: { fascism_totalitarianism:0.38, conformity_herd_mentality:0.31, identity_dehumanization:0.18, absurdism_satire:0.87, contemporary_political_resonance:0.14, performance_staging:0.62 },
+      evidence_keywords: ['farce', 'satire', 'rhinoceros fever', 'clichés', 'comic spectacle', 'absurdist form'],
+      explanation: 'The passage positions the play primarily as theatrical farce and comic spectacle. While fascism is present as a background frame, the critical vocabulary is dominated by absurdist form, satire, and performance values.',
+      uncertainty: 'low'
+    },
+    S3: {
+      dominant_frame: 'Fascism / Totalitarianism',
+      secondary_frames: ['Identity / Dehumanization', 'Conformity / Herd Mentality'],
+      scores: { fascism_totalitarianism:0.94, conformity_herd_mentality:0.52, identity_dehumanization:0.71, absurdism_satire:0.12, contemporary_political_resonance:0.28, performance_staging:0.06 },
+      evidence_keywords: ['Iron Guard', 'totalitarian ideology', 'rhinocerisation', 'loss of individual will', 'fascism normalises'],
+      explanation: 'A strongly historicised reading. The passage deploys the full vocabulary of anti-fascist allegory, anchoring the play in Ionesco\'s Romanian biographical context and the specific mechanisms of totalitarian seduction.',
+      uncertainty: 'low'
+    },
+    S4: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Contemporary Political Resonance', 'Fascism / Totalitarianism'],
+      scores: { fascism_totalitarianism:0.55, conformity_herd_mentality:0.89, identity_dehumanization:0.44, absurdism_satire:0.19, contemporary_political_resonance:0.76, performance_staging:0.22 },
+      evidence_keywords: ['conformity', 'herd', 'passivity', 'collective behaviour', 'abandon critical thinking', 'psychology'],
+      explanation: 'The review shifts from historical allegory toward present-day psychology of conformity. While authoritarianism is named, the critical weight falls on the mechanisms of peer imitation and passive assent rather than fascism per se.',
+      uncertainty: 'low'
+    },
+    S5: {
+      dominant_frame: 'Contemporary Political Resonance',
+      secondary_frames: ['Conformity / Herd Mentality', 'Identity / Dehumanization'],
+      scores: { fascism_totalitarianism:0.29, conformity_herd_mentality:0.82, identity_dehumanization:0.48, absurdism_satire:0.23, contemporary_political_resonance:0.91, performance_staging:0.18 },
+      evidence_keywords: ['unreflecting conformism', 'universal', 'social pressure', 'peer imitation', 'individual resistance'],
+      explanation: 'The passage explicitly rejects historically anchored fascist readings in favour of a universalised conformity argument. The dominant interpretive move is to extract a timeless mechanism from the historical allegory and project it onto the present.',
+      uncertainty: 'low'
+    },
+    S6: {
+      dominant_frame: 'Identity / Dehumanization',
+      secondary_frames: ['Contemporary Political Resonance', 'Fascism / Totalitarianism'],
+      scores: { fascism_totalitarianism:0.41, conformity_herd_mentality:0.55, identity_dehumanization:0.88, absurdism_satire:0.31, contemporary_political_resonance:0.67, performance_staging:0.44 },
+      evidence_keywords: ['epidemic', 'contagion', 'dehumanisation', 'identity collapse', 'biological', 'viral ideology'],
+      explanation: 'This text emphasises the collapse of individual identity through a contagion metaphor that merges biological and social threat. The dehumanisation frame is dominant; fascism is present but diffused into a broader contemporary anxiety about collective transformation.',
+      uncertainty: 'medium'
+    },
+    S12: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Fascism / Totalitarianism', 'Identity / Dehumanization'],
+      scores: { fascism_totalitarianism:0.58, conformity_herd_mentality:0.86, identity_dehumanization:0.61, absurdism_satire:0.14, contemporary_political_resonance:0.42, performance_staging:0.19 },
+      evidence_keywords: ['social conformity', 'peer pressure', 'group identity', 'rhinoceritis', 'Berenger', 'individuality'],
+      explanation: 'The educational description explicitly subordinates the fascist reading to the conformity argument, presenting Berenger\'s resistance as a defence of individuality against social assimilation. Fascism provides historical context; conformity is the analytical core.',
+      uncertainty: 'low'
+    }
+  },
+  gpt: {
+    S1: {
+      dominant_frame: 'Absurdism / Satire',
+      secondary_frames: ['Performance / Staging', 'Fascism / Totalitarianism'],
+      scores: { fascism_totalitarianism:0.44, conformity_herd_mentality:0.27, identity_dehumanization:0.16, absurdism_satire:0.82, contemporary_political_resonance:0.11, performance_staging:0.71 },
+      evidence_keywords: ['comedic metaphor', 'dark comedy', 'satirical', 'farce', 'comic spectacle'],
+      explanation: 'The review is overwhelmingly performance-oriented. GPT detects absurdist and satirical framing as dominant, with staging concerns secondary. The political allegory registers as background noise against the theatrical foreground.',
+      uncertainty: 'low'
+    },
+    S3: {
+      dominant_frame: 'Fascism / Totalitarianism',
+      secondary_frames: ['Identity / Dehumanization', 'Conformity / Herd Mentality'],
+      scores: { fascism_totalitarianism:0.91, conformity_herd_mentality:0.48, identity_dehumanization:0.74, absurdism_satire:0.09, contemporary_political_resonance:0.31, performance_staging:0.04 },
+      evidence_keywords: ['Iron Guard', 'fascism', 'totalitarian ideology', 'rhinocerisation', 'collective violence'],
+      explanation: 'GPT aligns closely with a fascism-forward reading. The passage is densely coded with anti-totalitarian vocabulary and the biographical Romanian frame is clearly legible to the model.',
+      uncertainty: 'low'
+    },
+    S4: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Fascism / Totalitarianism', 'Contemporary Political Resonance'],
+      scores: { fascism_totalitarianism:0.67, conformity_herd_mentality:0.84, identity_dehumanization:0.38, absurdism_satire:0.14, contemporary_political_resonance:0.69, performance_staging:0.18 },
+      evidence_keywords: ['conformity', 'herd', 'right-wing authoritarianism', 'passivity', 'collective behaviour'],
+      explanation: 'GPT reads the conformity frame as dominant but assigns a higher fascism score than Claude, reflecting sensitivity to the explicit "right-wing authoritarianism" language. The models broadly agree but weight the political valence differently.',
+      uncertainty: 'low'
+    },
+    S5: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Contemporary Political Resonance', 'Identity / Dehumanization'],
+      scores: { fascism_totalitarianism:0.24, conformity_herd_mentality:0.88, identity_dehumanization:0.44, absurdism_satire:0.19, contemporary_political_resonance:0.79, performance_staging:0.13 },
+      evidence_keywords: ['unreflecting conformism', 'peer imitation', 'social pressure', 'individual resistance', 'universal'],
+      explanation: 'GPT identifies conformity as dominant (vs. Claude\'s Contemporary Resonance). Both models detect the same strong signals, but GPT weights the conformity vocabulary slightly higher than the contemporary-resonance register. This small divergence is analytically significant.',
+      uncertainty: 'medium'
+    },
+    S6: {
+      dominant_frame: 'Identity / Dehumanization',
+      secondary_frames: ['Conformity / Herd Mentality', 'Contemporary Political Resonance'],
+      scores: { fascism_totalitarianism:0.36, conformity_herd_mentality:0.58, identity_dehumanization:0.84, absurdism_satire:0.27, contemporary_political_resonance:0.71, performance_staging:0.48 },
+      evidence_keywords: ['epidemic', 'contagion', 'dehumanisation', 'biological', 'spreading illness', 'identity collapse'],
+      explanation: 'Both models agree on the dominant frame but GPT assigns a higher staging score, reflecting the explicit staging description in the passage. The contagion metaphor registers strongly in both models.',
+      uncertainty: 'medium'
+    },
+    S12: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Fascism / Totalitarianism', 'Identity / Dehumanization'],
+      scores: { fascism_totalitarianism:0.62, conformity_herd_mentality:0.83, identity_dehumanization:0.57, absurdism_satire:0.11, contemporary_political_resonance:0.38, performance_staging:0.15 },
+      evidence_keywords: ['social conformity', 'peer pressure', 'conformity', 'group identity', 'individuality'],
+      explanation: 'Strong agreement with Claude on dominant frame. GPT assigns a slightly higher fascism score, consistent with its general tendency to weight explicit political vocabulary more heavily than contextual framing.',
+      uncertainty: 'low'
+    }
+  },
+  gemini: {
+    S1: {
+      dominant_frame: 'Performance / Staging',
+      secondary_frames: ['Absurdism / Satire', 'Fascism / Totalitarianism'],
+      scores: { fascism_totalitarianism:0.40, conformity_herd_mentality:0.24, identity_dehumanization:0.14, absurdism_satire:0.78, contemporary_political_resonance:0.09, performance_staging:0.83 },
+      evidence_keywords: ['Zero Mostel', 'Broadway', 'theatrical farce', 'comic spectacle', 'staging', 'performance'],
+      explanation: 'Gemini foregrounds the performance and staging dimension more prominently than GPT or Claude, assigning highest weight to the Broadway production context and Zero Mostel\'s theatrical persona. Absurdism registers closely behind. An interesting divergence from the other two models on frame priority.',
+      uncertainty: 'low'
+    },
+    S3: {
+      dominant_frame: 'Fascism / Totalitarianism',
+      secondary_frames: ['Identity / Dehumanization', 'Conformity / Herd Mentality'],
+      scores: { fascism_totalitarianism:0.96, conformity_herd_mentality:0.45, identity_dehumanization:0.68, absurdism_satire:0.08, contemporary_political_resonance:0.22, performance_staging:0.03 },
+      evidence_keywords: ['Iron Guard', 'fascist', 'totalitarian', 'rhinocerisation', 'Romanian intellectuals', 'loss of will'],
+      explanation: 'Gemini produces the highest fascism score of all three models for this passage, suggesting a strong prior toward historically grounded political allegory when explicit biographical context is present. Near-complete agreement with GPT and Claude on dominant frame.',
+      uncertainty: 'low'
+    },
+    S4: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Contemporary Political Resonance', 'Fascism / Totalitarianism'],
+      scores: { fascism_totalitarianism:0.60, conformity_herd_mentality:0.86, identity_dehumanization:0.41, absurdism_satire:0.16, contemporary_political_resonance:0.72, performance_staging:0.20 },
+      evidence_keywords: ['conformity', 'herd', 'authoritarianism', 'passivity', 'psychology', 'collective'],
+      explanation: 'Gemini agrees with both other models that conformity is dominant, and scores fascism slightly higher than Claude (closer to GPT). The three-model consensus on this passage is strong, making it a reliable coding result.',
+      uncertainty: 'low'
+    },
+    S5: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Contemporary Political Resonance', 'Identity / Dehumanization'],
+      scores: { fascism_totalitarianism:0.21, conformity_herd_mentality:0.91, identity_dehumanization:0.40, absurdism_satire:0.17, contemporary_political_resonance:0.75, performance_staging:0.11 },
+      evidence_keywords: ['unreflecting conformism', 'social pressure', 'peer imitation', 'belonging', 'individual resistance'],
+      explanation: 'Gemini agrees with GPT on the dominant frame (conformity) rather than Claude\'s contemporary-resonance reading. Two-to-one in favour of conformity as primary frame, though the difference in scores is small. The passage\'s explicit rejection of fascist readings resonates across all three models.',
+      uncertainty: 'low'
+    },
+    S6: {
+      dominant_frame: 'Identity / Dehumanization',
+      secondary_frames: ['Contemporary Political Resonance', 'Performance / Staging'],
+      scores: { fascism_totalitarianism:0.33, conformity_herd_mentality:0.49, identity_dehumanization:0.86, absurdism_satire:0.35, contemporary_political_resonance:0.64, performance_staging:0.52 },
+      evidence_keywords: ['epidemic', 'contagion', 'dehumanisation', 'community threat', 'staging', 'biological metaphor'],
+      explanation: 'Gemini strongly agrees on the identity/dehumanisation frame but assigns the highest staging score of all three models, reflecting sensitivity to the description of directorial choices. This is a notable divergence: Gemini reads the staging information as analytically significant.',
+      uncertainty: 'medium'
+    },
+    S12: {
+      dominant_frame: 'Conformity / Herd Mentality',
+      secondary_frames: ['Fascism / Totalitarianism', 'Identity / Dehumanization'],
+      scores: { fascism_totalitarianism:0.56, conformity_herd_mentality:0.89, identity_dehumanization:0.58, absurdism_satire:0.10, contemporary_political_resonance:0.35, performance_staging:0.13 },
+      evidence_keywords: ['social conformity', 'rhinoceritis', 'peer pressure', 'individuality', 'Berenger', 'group identity'],
+      explanation: 'Three-model consensus on dominant frame. Gemini produces the highest conformity score of the three (0.89), reflecting strong keyword sensitivity to the educational description\'s explicit conformity vocabulary. A reliable coding result.',
+      uncertainty: 'low'
+    }
+  }
+};
+
+// ── LIVE MODE: backend call structure (connect /api/analyze to activate) ──────
+// Supported model values: 'gpt', 'claude', 'gemini'. Missing providers fall back to demo mode.
+async function callLiveAPI(text, model) {
+  const res = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, model })
+  });
+  let data = null;
+  try { data = await res.json(); } catch (_) { data = {}; }
+  if (!res.ok) {
+    throw new Error(data.error || data.detail || `API error (${res.status})`);
+  }
+  return data;
+}
+
+function setLabStatus(message, type='') {
+  const el = document.getElementById('labStatusMessage');
+  if(!el) return;
+  el.className = `lab-status-message ${type}`;
+  el.textContent = message || '';
+}
+
+// ── DETECT LIVE ENDPOINT ─────────────────────────────────────────────────────
+let LIVE_ENDPOINT_AVAILABLE = false;
+// Try a lightweight ping; demo mode remains available even if live is detected.
+fetch('/api/analyze', { method:'HEAD' })
+  .then(r => {
+    if(r.ok || r.status===204 || r.status===405) {
+      LIVE_ENDPOINT_AVAILABLE = true;
+      document.getElementById('labModeBadge').className='lab-mode-badge live';
+      document.getElementById('labModeText').textContent='Live Endpoint Detected — Demo Fallback Ready';
+      document.getElementById('labModeNote').textContent='Live calls route securely through /api/analyze. API keys are never exposed in the browser.';
+    }
+  })
+  .catch(()=>{});
+
+// ── POPULATE SAMPLE DROPDOWN ──────────────────────────────────────────────────
+const labSelect = document.getElementById('sampleSelect');
+Object.keys(SAMPLE_TEXTS).forEach(id => {
+  const src = sources.find(s=>s.id===id);
+  if(!src) return;
+  const opt = document.createElement('option');
+  opt.value = id;
+  opt.textContent = `${src.id} — ${src.year} · ${src.title.substring(0,52)}${src.title.length>52?'…':''}`;
+  labSelect.appendChild(opt);
+});
+
+labSelect.addEventListener('change', () => {
+  const id = labSelect.value;
+  if(id && SAMPLE_TEXTS[id]) {
+    document.getElementById('labTextarea').value = SAMPLE_TEXTS[id];
+    updateCharCount();
+  }
+});
+
+// ── CHAR COUNT ────────────────────────────────────────────────────────────────
+function updateCharCount() {
+  const len = document.getElementById('labTextarea').value.length;
+  document.getElementById('charCount').textContent = len;
+  ['demoAnalyzeBtn','liveAnalyzeBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.disabled = len < 50;
+  });
+  document.getElementById('analyzeNote').textContent = len < 50
+    ? 'Requires text input (min. 50 characters)'
+    : 'Demo is stable for presentation; Live API tries /api/analyze and falls back to demo if unavailable.';
+  document.getElementById('analyzeNote').style.opacity = len < 50 ? '1' : '0.55';
+}
+document.getElementById('labTextarea').addEventListener('input', updateCharCount);
+updateCharCount();
+
+// ── MODEL SELECTOR ────────────────────────────────────────────────────────────
+let selectedModel = 'claude';
+document.querySelectorAll('.model-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.model-option').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+    opt.querySelector('input').checked = true;
+    selectedModel = opt.dataset.value;
+  });
+});
+
+// ── CHART INSTANCES (for cleanup) ────────────────────────────────────────────
+let chartInstances = {};
+function destroyChart(key) {
+  if(chartInstances[key]) { chartInstances[key].destroy(); delete chartInstances[key]; }
+}
+
+// ── RENDER RESULT CARD ────────────────────────────────────────────────────────
+function renderResultCard(el, result, modelKey) {
+  const modelLabel = modelKey==='gpt' ? 'GPT / OpenAI · gpt-4o'
+                   : modelKey==='gemini' ? 'Gemini / Google · gemini-3.5-flash'
+                   : 'Claude / Anthropic · claude-sonnet-4';
+  el.innerHTML = `
+    <div class="result-model-tag">
+      <span>${modelLabel}</span>
+    </div>
+    <div class="result-dominant">${result.dominant_frame}</div>
+    <div class="result-uncertainty ${result.uncertainty}">Uncertainty: ${result.uncertainty}</div>
+    <div class="result-secondary">
+      <div class="result-secondary-label">Secondary frames</div>
+      <div class="result-secondary-frames">
+        ${result.secondary_frames.map(f=>`<span class="result-frame-badge">${f}</span>`).join('')}
+      </div>
+    </div>
+    <div class="result-keywords">
+      <div class="result-kw-label">Evidence keywords</div>
+      <div class="result-kw-list">
+        ${result.evidence_keywords.map(k=>`<span class="result-kw">${k}</span>`).join('')}
+      </div>
+    </div>
+    <div class="result-explanation">${result.explanation}</div>
+  `;
+}
+
+// ── RENDER SCORE BARS ─────────────────────────────────────────────────────────
+function renderScoreBars(container, scores, dominant) {
+  container.innerHTML = '';
+  const sorted = [...FRAMES].sort((a,b)=>scores[b.key]-scores[a.key]);
+  sorted.forEach(f => {
+    const val = scores[f.key];
+    const isDom = f.label === dominant;
+    const row = document.createElement('div');
+    row.className = 'score-row';
+    row.innerHTML = `
+      <div class="score-label">${f.short}</div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill${isDom?' dominant':''}" style="width:0%" data-target="${Math.round(val*100)}%"></div>
+      </div>
+      <div class="score-value">${val.toFixed(2)}</div>
+    `;
+    container.appendChild(row);
+  });
+  // Animate bars
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      container.querySelectorAll('.score-bar-fill').forEach(bar=>{
+        bar.style.width = bar.dataset.target;
+      });
+    });
+  });
+}
+
+// ── RENDER POLAR CHART ────────────────────────────────────────────────────────
+function renderPolarChart(canvasId, scores, instanceKey) {
+  destroyChart(instanceKey);
+  const ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+  chartInstances[instanceKey] = new Chart(ctx, {
+    type: 'polarArea',
+    data: {
+      labels: FRAMES.map(f=>f.short),
+      datasets: [{
+        data: FRAMES.map(f=>scores[f.key]),
+        backgroundColor: FRAMES.map(f=>FRAME_COLORS[f.key]),
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)'
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { position:'bottom', labels:{ color:'#8A9E8C', font:{ family:"'DM Mono', monospace", size:9 }, padding:8, boxWidth:10 } }
+      },
+      scales: {
+        r: { grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ display:false }, beginAtZero:true, max:1 }
+      }
+    }
+  });
+}
+
+// ── RENDER RADAR CHART ────────────────────────────────────────────────────────
+function renderRadarChart(canvasId, scores, instanceKey, label, color) {
+  destroyChart(instanceKey);
+  const ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+  chartInstances[instanceKey] = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: FRAMES.map(f=>f.short),
+      datasets: [{
+        label: label||'Frame scores',
+        data: FRAMES.map(f=>scores[f.key]),
+        fill: true,
+        backgroundColor: color||'rgba(111,175,122,0.15)',
+        borderColor: color ? color.replace('0.15','0.8') : 'rgba(111,175,122,0.7)',
+        pointBackgroundColor: color ? color.replace('0.15','0.8') : 'rgba(111,175,122,0.8)',
+        pointRadius: 4,
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { labels:{ color:'#8A9E8C', font:{ family:"'DM Mono', monospace", size:9 } } }
+      },
+      scales: {
+        r: {
+          min: 0, max: 1,
+          grid:{ color:'rgba(255,255,255,0.06)' },
+          angleLines:{ color:'rgba(255,255,255,0.06)' },
+          ticks:{ display:false },
+          pointLabels:{ color:'#8A9E8C', font:{ family:"'DM Mono', monospace", size:9 } }
+        }
+      }
+    }
+  });
+}
+
+// ── RENDER AGREEMENT COMPARISON (3 models) ────────────────────────────────────
+function renderAgreementViz(container, gptScores, claudeScores, geminiScores) {
+  container.innerHTML = '';
+  let totalDiff = 0, comparisons = 0;
+  FRAMES.forEach(f => {
+    const gv = gptScores[f.key], cv = claudeScores[f.key], mv = geminiScores[f.key];
+    const maxDiff = Math.max(Math.abs(gv-cv), Math.abs(gv-mv), Math.abs(cv-mv));
+    totalDiff += maxDiff; comparisons++;
+    const row = document.createElement('div');
+    row.className = 'agreement-row';
+    row.innerHTML = `
+      <div class="agreement-frame-label">${f.short}</div>
+      <div class="agreement-bars">
+        <div class="agreement-bar-gpt"    style="width:0%" data-target="${Math.round(gv*100)}%"></div>
+        <div class="agreement-bar-claude" style="width:0%" data-target="${Math.round(cv*100)}%"></div>
+        <div class="agreement-bar-gemini" style="width:0%" data-target="${Math.round(mv*100)}%"></div>
+      </div>
+      <div class="agreement-diff ${maxDiff<0.15?'agree':'disagree'}">${maxDiff<0.15?'≈':'≠'} ${maxDiff.toFixed(2)}</div>
+    `;
+    container.appendChild(row);
+  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    container.querySelectorAll('[data-target]').forEach(b=>{ b.style.width = b.dataset.target; });
+  }));
+  const avgDiff = totalDiff / comparisons;
+  const verdict = document.getElementById('verdictBadge');
+  if(avgDiff < 0.12)       verdict.innerHTML = `<div class="compare-verdict agree">✓ Strong three-model consensus — avg. max-spread ${avgDiff.toFixed(2)}</div>`;
+  else if(avgDiff < 0.22)  verdict.innerHTML = `<div class="compare-verdict disagree">~ Moderate divergence — avg. max-spread ${avgDiff.toFixed(2)} — review highlighted frames</div>`;
+  else                     verdict.innerHTML = `<div class="compare-verdict disagree">⚠ Significant divergence — avg. max-spread ${avgDiff.toFixed(2)} — close reading recommended</div>`;
+}
+
+// ── RENDER THREE-MODEL RADAR OVERLAY ─────────────────────────────────────────
+function renderRadarOverlay(canvasId, gptScores, claudeScores, geminiScores, instanceKey) {
+  destroyChart(instanceKey);
+  const ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+  chartInstances[instanceKey] = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: FRAMES.map(f=>f.short),
+      datasets: [
+        { label:'GPT',    data:FRAMES.map(f=>gptScores[f.key]),    fill:true, backgroundColor:'rgba(16,163,127,0.08)',  borderColor:'rgba(16,163,127,0.7)',  pointBackgroundColor:'rgba(16,163,127,0.8)',  pointRadius:3, borderWidth:1.5 },
+        { label:'Claude', data:FRAMES.map(f=>claudeScores[f.key]), fill:true, backgroundColor:'rgba(212,167,107,0.08)', borderColor:'rgba(212,167,107,0.7)', pointBackgroundColor:'rgba(212,167,107,0.8)', pointRadius:3, borderWidth:1.5 },
+        { label:'Gemini', data:FRAMES.map(f=>geminiScores[f.key]), fill:true, backgroundColor:'rgba(122,158,224,0.08)', borderColor:'rgba(122,158,224,0.7)', pointBackgroundColor:'rgba(122,158,224,0.8)', pointRadius:3, borderWidth:1.5 },
+      ]
+    },
+    options: {
+      responsive:true,
+      animation:{ duration:900, easing:'easeOutQuart' },
+      plugins:{
+        legend:{ position:'bottom', labels:{ color:'#8A9E8C', font:{ family:"'DM Mono', monospace", size:9 }, padding:8, boxWidth:10 } }
+      },
+      scales:{
+        r:{ min:0, max:1, grid:{ color:'rgba(255,255,255,0.06)' }, angleLines:{ color:'rgba(255,255,255,0.06)' },
+            ticks:{ display:false }, pointLabels:{ color:'#8A9E8C', font:{ family:"'DM Mono', monospace", size:9 } } }
+      }
+    }
+  });
+}
+
+// ── MAIN ANALYZE FUNCTION ─────────────────────────────────────────────────────
+async function analyzeText(mode='demo') {
+  const text = document.getElementById('labTextarea').value.trim();
+  const sourceId = labSelect.value;
+  if(text.length < 50) return;
+
+  const demoBtn = document.getElementById('demoAnalyzeBtn');
+  const liveBtn = document.getElementById('liveAnalyzeBtn');
+  const activeBtn = mode === 'live' ? liveBtn : demoBtn;
+  const originalText = activeBtn.textContent;
+  demoBtn.disabled = true;
+  liveBtn.disabled = true;
+  activeBtn.classList.add('loading');
+  activeBtn.textContent = mode === 'live' ? 'Calling API…' : 'Loading demo…';
+  setLabStatus(mode === 'live'
+    ? 'Trying live analysis through /api/analyze. If the backend or API key is unavailable, this will fall back to demo results.'
+    : 'Using precomputed demo results. This mode is stable for presentations.',
+    mode === 'live' ? 'ok' : 'warn');
+
+  let gptResult = null, claudeResult = null, geminiResult = null;
+  const fallbackNotes = [];
+
+  const getDemoOrGenerate = (modelKey) => {
+    if(sourceId && DEMO_RESULTS[modelKey] && DEMO_RESULTS[modelKey][sourceId]) {
+      return DEMO_RESULTS[modelKey][sourceId];
+    }
+    return generateFallbackDemo(text, modelKey);
+  };
+
+  const getResult = async (modelKey) => {
+    if(mode !== 'live') {
+      return getDemoOrGenerate(modelKey);
+    }
+    try {
+      return await callLiveAPI(text, modelKey);
+    } catch (err) {
+      console.warn(`Live API failed for ${modelKey}:`, err);
+      fallbackNotes.push(`${modelKey.toUpperCase()}: ${err.message}`);
+      return getDemoOrGenerate(modelKey);
+    }
+  };
+
+  try {
+    if(mode !== 'live') await new Promise(r=>setTimeout(r,650));
+    if(selectedModel==='gpt'    || selectedModel==='compare') gptResult    = await getResult('gpt');
+    if(selectedModel==='claude' || selectedModel==='compare') claudeResult = await getResult('claude');
+    if(selectedModel==='gemini' || selectedModel==='compare') geminiResult = await getResult('gemini');
+  } catch(e) {
+    console.warn('Analysis error:', e);
+    setLabStatus(`Analysis failed: ${e.message}`, 'error');
+    activeBtn.classList.remove('loading');
+    activeBtn.textContent = originalText;
+    updateCharCount();
+    return;
+  }
+
+  activeBtn.classList.remove('loading');
+  activeBtn.textContent = originalText;
+  updateCharCount();
+
+  if(mode === 'live') {
+    if(fallbackNotes.length) {
+      setLabStatus(`Live API partially unavailable; fallback demo used for: ${fallbackNotes.join(' | ')}`, 'warn');
+    } else {
+      setLabStatus('Live API analysis complete. Results were generated through /api/analyze.', 'ok');
+    }
+  } else {
+    setLabStatus('Demo analysis complete. These are precomputed/simulated results, not live model outputs.', 'warn');
+  }
+
+  const resultsEl = document.getElementById('lab-results');
+  resultsEl.classList.add('visible');
+  const singleEl  = document.getElementById('singleResults');
+  const compareEl = document.getElementById('compareResults');
+  const headerEl  = document.getElementById('resultsHeader');
+
+  const modeLabel = mode === 'live' && !fallbackNotes.length ? 'Live API' : mode === 'live' ? 'Live attempt + demo fallback' : 'Demo mode';
+
+  if(selectedModel === 'compare') {
+    singleEl.style.display  = 'none';
+    compareEl.style.display = 'block';
+    headerEl.textContent    = `Comparative analysis — GPT · Claude · Gemini (${modeLabel})`;
+
+    renderResultCard(document.getElementById('compareGptCard'),    gptResult,    'gpt');
+    renderResultCard(document.getElementById('compareClaudeCard'), claudeResult, 'claude');
+    renderResultCard(document.getElementById('compareGeminiCard'), geminiResult, 'gemini');
+
+    renderAgreementViz(document.getElementById('agreementViz'), gptResult.scores, claudeResult.scores, geminiResult.scores);
+
+    setTimeout(()=>{
+      renderPolarChart('polarChartGpt',    gptResult.scores,    'polarGpt');
+      renderPolarChart('polarChartClaude', claudeResult.scores, 'polarClaude');
+      renderPolarChart('polarChartGemini', geminiResult.scores, 'polarGemini');
+      renderRadarOverlay('radarChartCompare', gptResult.scores, claudeResult.scores, geminiResult.scores, 'radarCompare');
+    }, 200);
+
+  } else {
+    singleEl.style.display  = 'block';
+    compareEl.style.display = 'none';
+
+    const result = selectedModel==='claude' ? claudeResult
+                 : selectedModel==='gemini' ? geminiResult
+                 : gptResult;
+
+    const modelLabel = selectedModel==='claude' ? 'Claude / Anthropic'
+                     : selectedModel==='gemini' ? 'Gemini / Google'
+                     : 'GPT / OpenAI';
+    headerEl.textContent = `Analysis complete — ${modelLabel} (${modeLabel})`;
+
+    const card = document.getElementById('mainResultCard');
+    card.className = `result-card model-${selectedModel}`;
+    renderResultCard(card, result, selectedModel);
+    renderScoreBars(document.getElementById('scoreBarViz'), result.scores, result.dominant_frame);
+
+    const radarColor = selectedModel==='claude'  ? 'rgba(212,167,107,0.15)'
+                     : selectedModel==='gemini'  ? 'rgba(122,158,224,0.15)'
+                     : 'rgba(16,163,127,0.15)';
+    setTimeout(()=>{
+      renderPolarChart('polarChart', result.scores, 'polarMain');
+      renderRadarChart('radarChart', result.scores, 'radarMain', 'Frame scores', radarColor);
+    }, 200);
+  }
+
+  resultsEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── FALLBACK DEMO GENERATOR (for custom text) ─────────────────────────────────
+function generateFallbackDemo(text, modelKey) {
+  const t = text.toLowerCase();
+  const raw = {
+    fascism_totalitarianism:     (count(t,['fascis','totalitar','iron guard','nazi','authoritar'])/5)*0.8 + 0.15,
+    conformity_herd_mentality:   (count(t,['conform','herd','groupthink','peer','collective'])/5)*0.8 + 0.15,
+    identity_dehumanization:     (count(t,['identity','dehumani','individual','epidemic','contagion'])/5)*0.8 + 0.12,
+    absurdism_satire:            (count(t,['absurd','satire','farce','comic','surreal'])/5)*0.8 + 0.1,
+    contemporary_political_resonance:(count(t,['contemporary','resonan','today','modern','current','politic'])/6)*0.8 + 0.12,
+    performance_staging:         (count(t,['production','staging','performance','theatre','director'])/5)*0.8 + 0.1,
+  };
+  // Add small model-specific noise
+  const noise = modelKey==='gpt' ? 0.05 : modelKey==='gemini' ? 0.03 : -0.03;
+  Object.keys(raw).forEach(k=>{ raw[k] = Math.min(0.97, Math.max(0.05, raw[k]+(Math.random()*0.12-0.06)+noise)); });
+  const sorted = Object.entries(raw).sort((a,b)=>b[1]-a[1]);
+  const domKey = sorted[0][0];
+  const domFrame = FRAMES.find(f=>f.key===domKey).label;
+  const secondary = sorted.slice(1,3).filter(e=>e[1]>0.45).map(e=>FRAMES.find(f=>f.key===e[0]).label);
+  return {
+    dominant_frame: domFrame,
+    secondary_frames: secondary,
+    scores: raw,
+    evidence_keywords: extractKeywords(text),
+    explanation: `Based on keyword density and contextual framing, the text appears primarily oriented toward ${domFrame}. This is a demo-mode fallback result — connect a backend endpoint for full LLM analysis.`,
+    uncertainty: 'high'
+  };
+}
+
+function count(text, keywords) {
+  return keywords.reduce((acc,kw)=>acc+(text.includes(kw)?1:0),0);
+}
+function extractKeywords(text) {
+  const kws = ['fascism','conformity','herd','totalitar','absurd','satire','identity','epidemic','dehumani','contemporary','staging','performance','iron guard','rhinoceros','contagion'];
+  return kws.filter(k=>text.toLowerCase().includes(k)).slice(0,6);
+}
+
+// ── BIND BUTTONS ──────────────────────────────────────────────────────────────
+document.getElementById('demoAnalyzeBtn').addEventListener('click', ()=>analyzeText('demo'));
+document.getElementById('liveAnalyzeBtn').addEventListener('click', ()=>analyzeText('live'));
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  document.getElementById('lab-results').classList.remove('visible');
+  setLabStatus('', '');
+  ['polarMain','radarMain','polarGpt','polarClaude','polarGemini','radarCompare'].forEach(destroyChart);
+});
+
+const sections = document.querySelectorAll('section[id]');
+const tocLinks = document.querySelectorAll('#toc a');
+const onScroll = () => {
+  let current = '';
+  sections.forEach(s=>{ if(window.scrollY >= s.offsetTop-200) current=s.id; });
+  tocLinks.forEach(a=>{ a.classList.toggle('active', a.getAttribute('href')==='#'+current); });
+};
+window.addEventListener('scroll', onScroll, { passive:true });
+</script>
+</body>
+</html>

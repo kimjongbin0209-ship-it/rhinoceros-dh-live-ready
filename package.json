@@ -1,0 +1,11 @@
+{
+  "name": "rhinoceros-dh-live-ready",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev"
+  },
+  "dependencies": {}
+}
