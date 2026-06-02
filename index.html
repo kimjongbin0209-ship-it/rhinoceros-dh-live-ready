@@ -1978,7 +1978,7 @@
             <div class="model-icon claude">C</div>
             <div class="model-info">
               <div class="model-name">Claude / Anthropic</div>
-              <div class="model-desc">claude-sonnet-4-6-6</div>
+              <div class="model-desc">claude-sonnet-4-6</div>
             </div>
             <div class="model-check"></div>
           </label>
@@ -1996,7 +1996,7 @@
             <div class="model-icon gemini">✦</div>
             <div class="model-info">
               <div class="model-name">Gemini / Google</div>
-              <div class="model-desc">fast live demo</div>
+              <div class="model-desc">gemini-3.5-flash</div>
             </div>
             <div class="model-check"></div>
           </label>
@@ -2025,7 +2025,7 @@
 
     <div class="lab-analyze-row">
       <button class="lab-btn" id="demoAnalyzeBtn">Show Demo Analysis</button>
-      <button class="lab-btn secondary" id="liveAnalyzeBtn">Analyze Live with Gemini</button>
+      <button class="lab-btn secondary" id="liveAnalyzeBtn">Analyze with Live API</button>
       <span class="lab-btn-note" id="analyzeNote">Requires text input (min. 50 characters)</span>
     </div>
     <div class="lab-status-message" id="labStatusMessage"></div>
@@ -2522,10 +2522,10 @@ const DEMO_RESULTS = {
 };
 
 // ── LIVE MODE: backend call structure (connect /api/analyze to activate) ──────
-// Supported model values: 'gpt', 'claude', 'gemini'
+// Supported model values: 'gpt', 'claude', 'gemini'. Compare mode sends one request per provider.
 async function callLiveAPI(text, model) {
   const controller = new AbortController();
-  const timeoutMs = 18000;
+  const timeoutMs = 60000;
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
@@ -2570,8 +2570,8 @@ async function callLiveAPI(text, model) {
 // sends a real POST request directly to /api/analyze.
 let LIVE_ENDPOINT_AVAILABLE = true;
 document.getElementById('labModeBadge').className='lab-mode-badge live';
-document.getElementById('labModeText').textContent='Live Endpoint Ready — Gemini POST Mode';
-document.getElementById('labModeNote').textContent='Live test uses Gemini only: browser → POST /api/analyze → Gemini API → JSON visualization.';
+document.getElementById('labModeText').textContent='Live Endpoint Ready — Selected Model Mode';
+document.getElementById('labModeNote').textContent='Live analysis uses the selected model: GPT, Claude, Gemini, or Compare mode via /api/analyze.';
 
 // ── STATUS + FRONTEND RESULT REPAIR ─────────────────────────────────────────
 function setLabStatus(message, type='') {
@@ -2656,7 +2656,7 @@ function updateCharCount() {
   });
   document.getElementById('analyzeNote').textContent = len < 50
     ? 'Requires text input (min. 50 characters)'
-    : 'Demo is stable for presentation; Live API tries /api/analyze and falls back to demo if unavailable.';
+    : 'Demo is stable for presentation; Live API uses the selected model and falls back to demo if unavailable.';
   document.getElementById('analyzeNote').style.opacity = len < 50 ? '1' : '0.55';
 }
 document.getElementById('labTextarea').addEventListener('input', updateCharCount);
@@ -2868,19 +2868,6 @@ async function analyzeText(mode='demo') {
   const sourceId = labSelect.value;
   if(text.length < 50) return;
 
-  // IMPORTANT: live mode is intentionally Gemini-only for speed and reliability.
-  // This guarantees one real POST request: POST /api/analyze with { model: 'gemini' }.
-  if (mode === 'live') {
-    selectedModel = 'gemini';
-    document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
-    const geminiOpt = document.querySelector('.model-option[data-value="gemini"]');
-    if (geminiOpt) {
-      geminiOpt.classList.add('selected');
-      const radio = geminiOpt.querySelector('input');
-      if (radio) radio.checked = true;
-    }
-  }
-
   const demoBtn = document.getElementById('demoAnalyzeBtn');
   const liveBtn = document.getElementById('liveAnalyzeBtn');
   const activeBtn = mode === 'live' ? liveBtn : demoBtn;
@@ -2888,9 +2875,10 @@ async function analyzeText(mode='demo') {
   demoBtn.disabled = true;
   liveBtn.disabled = true;
   activeBtn.classList.add('loading');
-  activeBtn.textContent = mode === 'live' ? 'Calling Gemini API…' : 'Loading demo…';
+  activeBtn.textContent = mode === 'live' ? 'Calling live API…' : 'Loading demo…';
+  const liveTargetLabel = selectedModel === 'compare' ? 'GPT, Claude, and Gemini' : selectedModel.toUpperCase();
   setLabStatus(mode === 'live'
-    ? 'Sending one real POST request to /api/analyze with model = gemini. Check Vercel Logs for POST /api/analyze.'
+    ? `Sending live POST request(s) to /api/analyze with selected model: ${liveTargetLabel}. Timeout is 60 seconds.`
     : 'Using precomputed demo results. This mode is stable for presentations.',
     mode === 'live' ? 'ok' : 'warn');
 
